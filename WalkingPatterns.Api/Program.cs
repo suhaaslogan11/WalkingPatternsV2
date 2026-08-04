@@ -19,6 +19,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IClientService, ClientService>();
 
+builder.Services.AddScoped<JwtService>();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 var app = builder.Build();
 
 // Configure pipeline
