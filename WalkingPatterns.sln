@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36915.13 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalkingPatterns.Api", "WalkingPatterns.Api\WalkingPatterns.Api.csproj", "{BD9D77CE-444D-404B-ACB4-6753EE9AA42E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BD9D77CE-444D-404B-ACB4-6753EE9AA42E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD9D77CE-444D-404B-ACB4-6753EE9AA42E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD9D77CE-444D-404B-ACB4-6753EE9AA42E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD9D77CE-444D-404B-ACB4-6753EE9AA42E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0D5443E0-B4EE-4E2E-B5BB-FCB4C6B10D29}
+	EndGlobalSection
+EndGlobal
