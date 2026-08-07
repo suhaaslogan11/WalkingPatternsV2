@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import clientService from "../../services/clientService";
 import type { Client } from "../../models/Client";
 
 function ClientForm() {
 
     const navigate = useNavigate();
+    const { id } = useParams();
 
     const [client, setClient] = useState<Client>({
         clientId: 0,
@@ -13,6 +14,35 @@ function ClientForm() {
         phone: "",
         email: ""
     });
+
+    useEffect(() => {
+
+        if (id) {
+            loadClient();
+        }
+
+    }, [id]);
+
+    const loadClient = async () => {
+
+        try {
+
+            const data = await clientService.getClient(Number(id));
+
+            setClient(data);
+
+        }
+        catch (error) {
+
+            console.error(error);
+
+            alert("Unable to load client");
+
+        }
+
+    };
+
+    
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement>
@@ -33,9 +63,20 @@ function ClientForm() {
 
         try {
 
-            await clientService.addClient(client);
+            if (id) {
 
-            alert("Client Added Successfully");
+                await clientService.updateClient(client);
+
+                alert("Client Updated Successfully");
+
+            }
+            else {
+
+                await clientService.addClient(client);
+
+                alert("Client Added Successfully");
+
+            }
 
             navigate("/");
 
@@ -54,67 +95,89 @@ function ClientForm() {
 
         <div className="container mt-5">
 
-            <h2>Add Client</h2>
+            <div className="card shadow">
 
-            <form onSubmit={handleSubmit}>
+                <div className="card-header">
 
-                <div className="mb-3">
-
-                    <label className="form-label">
-                        Client Name
-                    </label>
-
-                    <input
-                        type="text"
-                        name="clientName"
-                        className="form-control"
-                        value={client.clientName}
-                        onChange={handleChange}
-                    />
+                    <h3>
+                        {id ? "Edit Client" : "Add Client"}
+                    </h3>
 
                 </div>
 
-                <div className="mb-3">
+                <div className="card-body">
 
-                    <label className="form-label">
-                        Phone
-                    </label>
+                    <form onSubmit={handleSubmit}>
 
-                    <input
-                        type="text"
-                        name="phone"
-                        className="form-control"
-                        value={client.phone}
-                        onChange={handleChange}
-                    />
+                        <div className="mb-3">
+
+                            <label className="form-label">
+                                Client Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="clientName"
+                                className="form-control"
+                                value={client.clientName}
+                                onChange={handleChange}
+                                required
+                            />
+
+                        </div>
+
+                        <div className="mb-3">
+
+                            <label className="form-label">
+                                Phone
+                            </label>
+
+                            <input
+                                type="text"
+                                name="phone"
+                                className="form-control"
+                                value={client.phone}
+                                onChange={handleChange}
+                            />
+
+                        </div>
+
+                        <div className="mb-3">
+
+                            <label className="form-label">
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                name="email"
+                                className="form-control"
+                                value={client.email}
+                                onChange={handleChange}
+                            />
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="btn btn-success me-2">
+
+                            {id ? "Update" : "Save"}
+
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={() => navigate("/")}>
+                            Cancel
+                        </button>
+
+                    </form>
 
                 </div>
 
-                <div className="mb-3">
-
-                    <label className="form-label">
-                        Email
-                    </label>
-
-                    <input
-                        type="email"
-                        name="email"
-                        className="form-control"
-                        value={client.email}
-                        onChange={handleChange}
-                    />
-
-                </div>
-
-                <button
-                    className="btn btn-success"
-                    type="submit">
-
-                    Save
-
-                </button>
-
-            </form>
+            </div>
 
         </div>
 

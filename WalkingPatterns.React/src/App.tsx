@@ -8,10 +8,18 @@ function App() {
 
         <Routes>
 
-            <Route path="/" element={<ClientList />} />
+            <Route
+                path="/"
+                element={<ClientList />}
+            />
 
             <Route
                 path="/clients/add"
+                element={<ClientForm />}
+            />
+
+            <Route
+                path="/clients/edit/:id"
                 element={<ClientForm />}
             />
 

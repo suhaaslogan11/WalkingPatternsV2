@@ -6,12 +6,29 @@ const getClients = async (): Promise<Client[]> => {
     return response.data;
 };
 
-const addClient = async (client: Client): Promise<Client> => {
+const getClient = async (id: number): Promise<Client> => {
+    const response = await api.get(`/Clients/${id}`);
+    return response.data;
+};
+
+const addClient = async (client: Client) => {
     const response = await api.post("/Clients", client);
     return response.data;
 };
 
+const updateClient = async (client: Client) => {
+    const response = await api.put(`/Clients/${client.clientId}`, client);
+    return response.data;
+};
+
+const deleteClient = async (id: number) => {
+    await api.delete(`/Clients/${id}`);
+};
+
 export default {
     getClients,
-    addClient
+    getClient,
+    addClient,
+    updateClient,
+    deleteClient
 };

@@ -3,23 +3,19 @@
 bin/
 obj/
 
-# User files
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
+# Node
+node_modules/
+**/node_modules/
 
 # Logs
 *.log
 
-# Rider
-.idea/
+# User files
+*.user
+*.suo
 
 # VS Code
 .vscode/
 
-# Packages
-packages/
-
-# NuGet
-*.nupkg
+# Rider
+.idea/
