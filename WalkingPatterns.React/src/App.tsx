@@ -1,11 +1,12 @@
 import { Routes, Route } from "react-router-dom";
 import ClientList from "./pages/clients/ClientList";
 import ClientForm from "./pages/clients/ClientForm";
+import { ToastContainer } from "react-toastify";
 
 function App() {
 
     return (
-
+    <>
         <Routes>
 
             <Route
@@ -25,7 +26,19 @@ function App() {
 
         </Routes>
 
-    );
+        <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            pauseOnHover
+            theme="colored"
+        />
+    </>
+);
+
+
 
 }
 

@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+
 import clientService from "../../services/clientService";
 import type { Client } from "../../models/Client";
 
@@ -8,12 +11,12 @@ function ClientForm() {
     const navigate = useNavigate();
     const { id } = useParams();
 
-    const [client, setClient] = useState<Client>({
-        clientId: 0,
-        clientName: "",
-        phone: "",
-        email: ""
-    });
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors }
+    } = useForm<Client>();
 
     useEffect(() => {
 
@@ -29,52 +32,37 @@ function ClientForm() {
 
             const data = await clientService.getClient(Number(id));
 
-            setClient(data);
+            setValue("clientId", data.clientId);
+            setValue("clientName", data.clientName);
+            setValue("phone", data.phone);
+            setValue("email", data.email);
 
         }
         catch (error) {
 
             console.error(error);
-
-            alert("Unable to load client");
+            toast.error("Unable to load client");
 
         }
 
     };
 
-    
-
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement>
-    ) => {
-
-        setClient({
-            ...client,
-            [e.target.name]: e.target.value
-        });
-
-    };
-
-    const handleSubmit = async (
-        e: React.FormEvent
-    ) => {
-
-        e.preventDefault();
+    const onSubmit = async (data: Client) => {
 
         try {
 
             if (id) {
 
-                await clientService.updateClient(client);
+                await clientService.updateClient(Number(id), data);
 
-                alert("Client Updated Successfully");
+                toast.success("Client Updated Successfully");
 
             }
             else {
 
-                await clientService.addClient(client);
+                await clientService.addClient(data);
 
-                alert("Client Added Successfully");
+                toast.success("Client Added Successfully");
 
             }
 
@@ -85,7 +73,7 @@ function ClientForm() {
 
             console.error(error);
 
-            alert("Unable to save client");
+            toast.error("Unable to save client");
 
         }
 
@@ -95,89 +83,110 @@ function ClientForm() {
 
         <div className="container mt-5">
 
-            <div className="card shadow">
+            <h2 className="mb-4">
 
-                <div className="card-header">
+                {id ? "Edit Client" : "Add Client"}
 
-                    <h3>
-                        {id ? "Edit Client" : "Add Client"}
-                    </h3>
+            </h2>
+
+            <form onSubmit={handleSubmit(onSubmit)}>
+
+                <div className="mb-3">
+
+                    <label className="form-label">
+                        Client Name
+                    </label>
+
+                    <input
+                        type="text"
+                        className="form-control"
+                        {...register("clientName", {
+                            required: "Client Name is required"
+                        })}
+                    />
+
+                    {errors.clientName && (
+
+                        <div className="text-danger">
+                            {errors.clientName.message}
+                        </div>
+
+                    )}
 
                 </div>
 
-                <div className="card-body">
+                <div className="mb-3">
 
-                    <form onSubmit={handleSubmit}>
+                    <label className="form-label">
+                        Phone
+                    </label>
 
-                        <div className="mb-3">
+                    <input
+                        type="text"
+                        className="form-control"
+                        {...register("phone", {
+                            required: "Phone is required",
+                            pattern: {
+                                value: /^[0-9]{10}$/,
+                                message: "Phone must be 10 digits"
+                            }
+                        })}
+                    />
 
-                            <label className="form-label">
-                                Client Name
-                            </label>
+                    {errors.phone && (
 
-                            <input
-                                type="text"
-                                name="clientName"
-                                className="form-control"
-                                value={client.clientName}
-                                onChange={handleChange}
-                                required
-                            />
-
+                        <div className="text-danger">
+                            {errors.phone.message}
                         </div>
 
-                        <div className="mb-3">
-
-                            <label className="form-label">
-                                Phone
-                            </label>
-
-                            <input
-                                type="text"
-                                name="phone"
-                                className="form-control"
-                                value={client.phone}
-                                onChange={handleChange}
-                            />
-
-                        </div>
-
-                        <div className="mb-3">
-
-                            <label className="form-label">
-                                Email
-                            </label>
-
-                            <input
-                                type="email"
-                                name="email"
-                                className="form-control"
-                                value={client.email}
-                                onChange={handleChange}
-                            />
-
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="btn btn-success me-2">
-
-                            {id ? "Update" : "Save"}
-
-                        </button>
-
-                        <button
-                            type="button"
-                            className="btn btn-secondary"
-                            onClick={() => navigate("/")}>
-                            Cancel
-                        </button>
-
-                    </form>
+                    )}
 
                 </div>
 
-            </div>
+                <div className="mb-3">
+
+                    <label className="form-label">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        className="form-control"
+                        {...register("email", {
+                            required: "Email is required",
+                            pattern: {
+                                value: /^\S+@\S+\.\S+$/,
+                                message: "Invalid Email"
+                            }
+                        })}
+                    />
+
+                    {errors.email && (
+
+                        <div className="text-danger">
+                            {errors.email.message}
+                        </div>
+
+                    )}
+
+                </div>
+
+                <button
+                    type="submit"
+                    className="btn btn-success"
+                >
+                    {id ? "Update" : "Save"}
+                </button>
+
+                <button
+                    type="button"
+                    className="btn btn-secondary ms-2"
+                    onClick={() => navigate("/")}
+                >
+                    Cancel
+                </button>
+
+            </form>
 
         </div>
 

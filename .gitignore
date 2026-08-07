@@ -19,3 +19,9 @@ node_modules/
 
 # Rider
 .idea/
+
+# Ignore all Node dependencies
+**/node_modules/
+
+# Ignore package locks outside projects
+**/package-lock.json

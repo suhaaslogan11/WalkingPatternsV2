@@ -16,8 +16,8 @@ const addClient = async (client: Client) => {
     return response.data;
 };
 
-const updateClient = async (client: Client) => {
-    const response = await api.put(`/Clients/${client.clientId}`, client);
+const updateClient = async (id: number, client: Client): Promise<Client> => {
+    const response = await api.put(`/Clients/${id}`, client);
     return response.data;
 };
 
