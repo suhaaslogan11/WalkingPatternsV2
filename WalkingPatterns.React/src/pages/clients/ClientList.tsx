@@ -97,7 +97,7 @@ function ClientList() {
                                 <th>Name</th>
                                 <th>Phone</th>
                                 <th>Email</th>
-                                <th style={{ width: "150px" }}>
+                                <th style={{ width: "230px" }}>
                                     Actions
                                 </th>
 
@@ -139,6 +139,14 @@ function ClientList() {
                                                 className="btn btn-warning btn-sm me-2">
 
                                                 Edit
+
+                                            </Link>
+
+                                            <Link
+                                                to={`/clients/${client.clientId}/projects`}
+                                                className="btn btn-info btn-sm me-2">
+
+                                                Projects
 
                                             </Link>
 

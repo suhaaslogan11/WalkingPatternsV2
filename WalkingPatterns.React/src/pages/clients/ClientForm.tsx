@@ -55,14 +55,14 @@ function ClientForm() {
 
                 await clientService.updateClient(Number(id), data);
 
-                toast.success("Client Updated Successfully");
+                toast.success("Client updated successfully");
 
             }
             else {
 
                 await clientService.addClient(data);
 
-                toast.success("Client Added Successfully");
+                toast.success("Client added successfully");
 
             }
 
@@ -89,7 +89,7 @@ function ClientForm() {
 
             </h2>
 
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
 
                 <div className="mb-3">
 
@@ -127,8 +127,8 @@ function ClientForm() {
                         {...register("phone", {
                             required: "Phone is required",
                             pattern: {
-                                value: /^[0-9]{10}$/,
-                                message: "Phone must be 10 digits"
+                                value: /^[6-9]\d{9}$/,
+                                message: "Enter a valid 10-digit Indian mobile number"
                             }
                         })}
                     />
@@ -156,7 +156,7 @@ function ClientForm() {
                             required: "Email is required",
                             pattern: {
                                 value: /^\S+@\S+\.\S+$/,
-                                message: "Invalid Email"
+                                message: "Enter a valid email address"
                             }
                         })}
                     />

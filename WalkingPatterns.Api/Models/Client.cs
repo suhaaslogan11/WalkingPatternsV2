@@ -16,5 +16,9 @@ namespace WalkingPatterns.Api.Models
 
         [EmailAddress]
         public string Email { get; set; }
+
+        public string? Address { get; set; }
+
+        public ICollection<ProjectVersionDetails> ProjectVersions { get; set; } = new List<ProjectVersionDetails>();
     }
 }

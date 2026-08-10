@@ -1,0 +1,15 @@
+using WalkingPatterns.Api.DTOs;
+
+namespace WalkingPatterns.Api.Interfaces
+{
+    public interface IProjectService
+    {
+        Task<bool> ClientExistsAsync(int clientId);
+        Task<bool> ProjectNameExistsAsync(string projectName, int? excludeProjectId = null);
+        Task<List<ProjectResponse>> GetProjectsByClientIdAsync(int clientId);
+        Task<ProjectResponse?> GetProjectByIdAsync(int id);
+        Task<ProjectResponse> AddProjectAsync(int clientId, AddProjectRequest request, string storedProjectDate);
+        Task<ProjectResponse?> UpdateProjectAsync(int id, AddProjectRequest request, string storedProjectDate);
+        Task<bool> DeleteProjectAsync(int id);
+    }
+}
