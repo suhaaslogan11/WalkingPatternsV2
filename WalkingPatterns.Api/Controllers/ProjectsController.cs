@@ -103,6 +103,19 @@ namespace WalkingPatterns.Api.Controllers
             return NoContent();
         }
 
+        [HttpDelete("projects/{projectId:int}/modules/{projectDetailId:int}")]
+        public async Task<IActionResult> DeleteProjectModule(int projectId, int projectDetailId)
+        {
+            var deleted = await _projectService.DeleteProjectModuleAsync(
+                projectId,
+                projectDetailId);
+
+            if (!deleted)
+                return NotFound(new { message = "Project module not found." });
+
+            return NoContent();
+        }
+
         [HttpPost("clients/{clientId:int}/projects")]
         public async Task<IActionResult> AddProject(int clientId, AddProjectRequest request)
         {

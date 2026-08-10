@@ -196,6 +196,40 @@ namespace WalkingPatterns.Api.Services
             return true;
         }
 
+        public async Task<bool> DeleteProjectModuleAsync(int projectId, int projectDetailId)
+        {
+            var selectedDetail = await _context.ProjectDetails
+                .SingleOrDefaultAsync(detail =>
+                    detail.Id == projectDetailId &&
+                    detail.ProjectId == projectId);
+
+            if (selectedDetail == null)
+                return false;
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            var roomName = selectedDetail.RoomName;
+            var projectDetails = await _context.ProjectDetails
+                .Where(detail =>
+                    detail.ProjectId == projectId &&
+                    detail.RoomName == roomName)
+                .ToListAsync();
+
+            var relatedOrders = await _context.OrderDetails
+                .Where(order =>
+                    order.ProjectVersionDetailsId == projectId &&
+                    order.ProjectId == projectId &&
+                    order.UtilityName == roomName)
+                .ToListAsync();
+
+            _context.OrderDetails.RemoveRange(relatedOrders);
+            _context.ProjectDetails.RemoveRange(projectDetails);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return true;
+        }
+
         public async Task<ProjectResponse> AddProjectAsync(
             int clientId,
             AddProjectRequest request,

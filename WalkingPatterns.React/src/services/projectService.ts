@@ -46,6 +46,10 @@ const deleteOrder = async (orderId: number) => {
     await api.delete(`/orders/${orderId}`);
 };
 
+const deleteProjectModule = async (projectId: number, projectDetailId: number) => {
+    await api.delete(`/projects/${projectId}/modules/${projectDetailId}`);
+};
+
 const addProject = async (
     clientId: number,
     project: AddProjectRequest
@@ -74,6 +78,7 @@ export default {
     getProjectFinancials,
     applyDiscount,
     deleteOrder,
+    deleteProjectModule,
     addProject,
     deleteProject,
     updateProject

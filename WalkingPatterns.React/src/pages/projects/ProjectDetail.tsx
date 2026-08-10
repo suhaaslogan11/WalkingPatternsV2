@@ -119,6 +119,35 @@ function ProjectDetail() {
 
     };
 
+    const handleDeleteModule = async (projectDetailId: number, roomName: string) => {
+
+        if (!window.confirm(`Are you sure you want to delete the ${roomName} module?`))
+            return;
+
+        try {
+
+            await projectService.deleteProjectModule(parsedProjectId, projectDetailId);
+
+            const [updatedDetails, updatedFinancials] = await Promise.all([
+                projectService.getProjectDetails(parsedProjectId),
+                projectService.getProjectFinancials(parsedProjectId)
+            ]);
+
+            setDetails(updatedDetails);
+            setFinancials(updatedFinancials);
+            setOrders(null);
+            toast.success("Module deleted successfully");
+
+        }
+        catch (error) {
+
+            console.error(error);
+            toast.error("Unable to delete module");
+
+        }
+
+    };
+
     if (!Number.isInteger(parsedProjectId) || parsedProjectId <= 0) {
         return (
             <div className="container mt-5">
@@ -237,6 +266,12 @@ function ProjectDetail() {
                                                 onClick={() => handleViewOrders(module.projectDetailId)}
                                             >
                                                 View Orders
+                                            </button>
+                                            <button
+                                                className="btn btn-danger btn-sm ms-2"
+                                                onClick={() => handleDeleteModule(module.projectDetailId, module.roomName)}
+                                            >
+                                                Delete
                                             </button>
                                         </td>
                                     </tr>
