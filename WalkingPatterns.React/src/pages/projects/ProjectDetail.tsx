@@ -1,30 +1,78 @@
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import type { ProjectDetailPage, ProjectOrders } from "../../models/Project";
+import type {
+    ProjectDetailPage,
+    ProjectFinancials,
+    ProjectOrders
+} from "../../models/Project";
 import projectService from "../../services/projectService";
 
 function ProjectDetail() {
+
+    type DiscountForm = {
+        discountAmount: number;
+    };
 
     const navigate = useNavigate();
     const { projectId } = useParams();
     const parsedProjectId = Number(projectId);
     const [details, setDetails] = useState<ProjectDetailPage>();
+    const [financials, setFinancials] = useState<ProjectFinancials>();
     const [orders, setOrders] = useState<ProjectOrders | null>(null);
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors }
+    } = useForm<DiscountForm>({
+        defaultValues: { discountAmount: 0 }
+    });
 
     useEffect(() => {
 
         if (!Number.isInteger(parsedProjectId) || parsedProjectId <= 0)
             return;
 
-        void projectService.getProjectDetails(parsedProjectId)
-            .then(setDetails)
+        void Promise.all([
+            projectService.getProjectDetails(parsedProjectId),
+            projectService.getProjectFinancials(parsedProjectId)
+        ])
+            .then(([projectDetails, projectFinancials]) => {
+                setDetails(projectDetails);
+                setFinancials(projectFinancials);
+                reset({ discountAmount: projectFinancials.discountAmount });
+            })
             .catch((error) => {
                 console.error(error);
                 toast.error("Unable to load project details");
             });
 
-    }, [parsedProjectId]);
+    }, [parsedProjectId, reset]);
+
+    const onApplyDiscount = async (data: DiscountForm) => {
+
+        try {
+
+            const updatedFinancials = await projectService.applyDiscount(
+                parsedProjectId,
+                data.discountAmount
+            );
+
+            setFinancials(updatedFinancials);
+            reset({ discountAmount: updatedFinancials.discountAmount });
+            toast.success("Discount applied successfully");
+
+        }
+        catch (error) {
+
+            console.error(error);
+            toast.error("Unable to apply discount");
+
+        }
+
+    };
 
     const handleViewOrders = async (projectDetailId: number) => {
 
@@ -54,7 +102,7 @@ function ProjectDetail() {
         );
     }
 
-    if (!details) {
+    if (!details || !financials) {
         return <div className="container mt-5">Loading project details...</div>;
     }
 
@@ -77,6 +125,50 @@ function ProjectDetail() {
                         <div className="col-md-3"><strong>Date:</strong> {details.projectDate}</div>
                         <div className="col-md-3"><strong>Version:</strong> {details.versionNumber}</div>
                     </div>
+                </div>
+            </div>
+
+            <div className="card shadow mb-4">
+                <div className="card-header">
+                    <h4 className="mb-0">Price Summary</h4>
+                </div>
+                <div className="card-body">
+                    <div className="row mb-3">
+                        <div className="col-md-4"><strong>Grand Total:</strong> ₹{financials.grandTotal.toFixed(2)}</div>
+                        <div className="col-md-4"><strong>Discount:</strong> ₹{financials.discountAmount.toFixed(2)}</div>
+                        <div className="col-md-4"><strong>Discounted Total:</strong> ₹{financials.discountedTotal.toFixed(2)}</div>
+                    </div>
+                    <form onSubmit={handleSubmit(onApplyDiscount)} noValidate>
+                        <div className="row g-3 align-items-end">
+                            <div className="col-md-4">
+                                <label className="form-label">Discount Amount</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    className="form-control"
+                                    {...register("discountAmount", {
+                                        required: "Discount amount is required",
+                                        min: {
+                                            value: 0,
+                                            message: "Discount cannot be negative"
+                                        },
+                                        valueAsNumber: true
+                                    })}
+                                />
+                                {errors.discountAmount && (
+                                    <div className="text-danger">
+                                        {errors.discountAmount.message}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="col-md-3">
+                                <button type="submit" className="btn btn-primary">
+                                    Apply Discount
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
 

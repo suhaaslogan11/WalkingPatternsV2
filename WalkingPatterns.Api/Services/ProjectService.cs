@@ -136,6 +136,53 @@ namespace WalkingPatterns.Api.Services
             };
         }
 
+        public async Task<ProjectFinancialResponse?> GetProjectFinancialsAsync(int projectId)
+        {
+            var project = await _context.ProjectVersionDetails.FindAsync(projectId);
+
+            if (project == null)
+                return null;
+
+            var grandTotal = await _context.OrderDetails
+                .Where(order => order.ProjectVersionDetailsId == projectId)
+                .SumAsync(order => order.TotalPrice);
+
+            return new ProjectFinancialResponse
+            {
+                GrandTotal = grandTotal,
+                DiscountAmount = project.DiscountAmount,
+                DiscountedTotal = grandTotal - project.DiscountAmount
+            };
+        }
+
+        public async Task<ProjectFinancialResponse?> ApplyDiscountAsync(int projectId, double discountAmount)
+        {
+            var project = await _context.ProjectVersionDetails.FindAsync(projectId);
+
+            if (project == null)
+                return null;
+
+            var grandTotal = await _context.OrderDetails
+                .Where(order => order.ProjectVersionDetailsId == projectId)
+                .SumAsync(order => order.TotalPrice);
+
+            if (discountAmount < 0 || discountAmount > grandTotal)
+                throw new ArgumentOutOfRangeException(nameof(discountAmount), "Invalid discount amount.");
+
+            project.GrandTotal = grandTotal;
+            project.DiscountAmount = discountAmount;
+            project.DiscountedTotal = grandTotal - discountAmount;
+
+            await _context.SaveChangesAsync();
+
+            return new ProjectFinancialResponse
+            {
+                GrandTotal = project.GrandTotal,
+                DiscountAmount = project.DiscountAmount,
+                DiscountedTotal = project.DiscountedTotal
+            };
+        }
+
         public async Task<ProjectResponse> AddProjectAsync(
             int clientId,
             AddProjectRequest request,

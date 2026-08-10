@@ -3,6 +3,7 @@ import type {
     AddProjectRequest,
     Project,
     ProjectDetailPage,
+    ProjectFinancials,
     ProjectOrders
 } from "../models/Project";
 
@@ -23,6 +24,21 @@ const getProjectDetails = async (projectId: number): Promise<ProjectDetailPage> 
 
 const getProjectDetailOrders = async (projectDetailId: number): Promise<ProjectOrders> => {
     const response = await api.get(`/project-details/${projectDetailId}/orders`);
+    return response.data;
+};
+
+const getProjectFinancials = async (projectId: number): Promise<ProjectFinancials> => {
+    const response = await api.get(`/projects/${projectId}/grand-total`);
+    return response.data;
+};
+
+const applyDiscount = async (
+    projectId: number,
+    discountAmount: number
+): Promise<ProjectFinancials> => {
+    const response = await api.post(`/projects/${projectId}/discount`, {
+        discountAmount
+    });
     return response.data;
 };
 
@@ -51,6 +67,8 @@ export default {
     getProject,
     getProjectDetails,
     getProjectDetailOrders,
+    getProjectFinancials,
+    applyDiscount,
     addProject,
     deleteProject,
     updateProject

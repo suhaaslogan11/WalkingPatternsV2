@@ -59,3 +59,9 @@ export interface ProjectOrders {
     roomName: string;
     orders: OrderDetail[];
 }
+
+export interface ProjectFinancials {
+    grandTotal: number;
+    discountAmount: number;
+    discountedTotal: number;
+}

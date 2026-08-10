@@ -59,6 +59,39 @@ namespace WalkingPatterns.Api.Controllers
             return Ok(orders);
         }
 
+        [HttpGet("projects/{projectId:int}/grand-total")]
+        public async Task<IActionResult> GetGrandTotal(int projectId)
+        {
+            var financials = await _projectService.GetProjectFinancialsAsync(projectId);
+
+            if (financials == null)
+                return NotFound(new { message = "Project not found." });
+
+            return Ok(financials);
+        }
+
+        [HttpPost("projects/{projectId:int}/discount")]
+        public async Task<IActionResult> ApplyDiscount(
+            int projectId,
+            ApplyDiscountRequest request)
+        {
+            try
+            {
+                var financials = await _projectService.ApplyDiscountAsync(
+                    projectId,
+                    request.DiscountAmount);
+
+                if (financials == null)
+                    return NotFound(new { message = "Project not found." });
+
+                return Ok(financials);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return BadRequest(new { message = "Invalid discount amount." });
+            }
+        }
+
         [HttpPost("clients/{clientId:int}/projects")]
         public async Task<IActionResult> AddProject(int clientId, AddProjectRequest request)
         {
