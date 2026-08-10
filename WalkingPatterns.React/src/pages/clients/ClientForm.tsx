@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -18,15 +18,7 @@ function ClientForm() {
         formState: { errors }
     } = useForm<Client>();
 
-    useEffect(() => {
-
-        if (id) {
-            loadClient();
-        }
-
-    }, [id]);
-
-    const loadClient = async () => {
+    const loadClient = useCallback(async () => {
 
         try {
 
@@ -45,7 +37,15 @@ function ClientForm() {
 
         }
 
-    };
+    }, [id, setValue]);
+
+    useEffect(() => {
+
+        if (id) {
+            loadClient();
+        }
+
+    }, [id, loadClient]);
 
     const onSubmit = async (data: Client) => {
 

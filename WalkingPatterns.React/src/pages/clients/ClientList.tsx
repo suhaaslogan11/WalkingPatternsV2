@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import clientService from "../../services/clientService";
 import type { Client } from "../../models/Client";
@@ -7,11 +7,7 @@ function ClientList() {
 
     const [clients, setClients] = useState<Client[]>([]);
 
-    useEffect(() => {
-        loadClients();
-    }, []);
-
-    const loadClients = async () => {
+    const loadClients = useCallback(async () => {
 
         try {
 
@@ -28,7 +24,16 @@ function ClientList() {
 
         }
 
-    };
+    }, []);
+
+    useEffect(() => {
+        void clientService.getClients()
+            .then(setClients)
+            .catch((error) => {
+                console.error(error);
+                alert("Unable to load clients");
+            });
+    }, []);
 
     const handleDelete = async (id: number) => {
 
