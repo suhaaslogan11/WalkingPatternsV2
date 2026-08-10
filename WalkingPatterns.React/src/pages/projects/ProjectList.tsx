@@ -221,6 +221,12 @@ function ProjectList() {
                                         <td>{project.versionNumber}</td>
                                         <td>
                                             <Link
+                                                to={`/projects/${project.id}`}
+                                                className="btn btn-info btn-sm me-2"
+                                            >
+                                                Details
+                                            </Link>
+                                            <Link
                                                 to={`/projects/edit/${project.id}`}
                                                 state={{ project }}
                                                 className="btn btn-warning btn-sm me-2"

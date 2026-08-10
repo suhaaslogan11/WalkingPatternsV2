@@ -37,6 +37,28 @@ namespace WalkingPatterns.Api.Controllers
             return Ok(project);
         }
 
+        [HttpGet("projects/{projectId:int}/details")]
+        public async Task<IActionResult> GetProjectDetails(int projectId)
+        {
+            var details = await _projectService.GetProjectDetailPageAsync(projectId);
+
+            if (details == null)
+                return NotFound(new { message = "Project not found." });
+
+            return Ok(details);
+        }
+
+        [HttpGet("project-details/{projectDetailId:int}/orders")]
+        public async Task<IActionResult> GetProjectDetailOrders(int projectDetailId)
+        {
+            var orders = await _projectService.GetOrdersByProjectDetailIdAsync(projectDetailId);
+
+            if (orders == null)
+                return NotFound(new { message = "Project details not found." });
+
+            return Ok(orders);
+        }
+
         [HttpPost("clients/{clientId:int}/projects")]
         public async Task<IActionResult> AddProject(int clientId, AddProjectRequest request)
         {

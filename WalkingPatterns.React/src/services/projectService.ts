@@ -1,5 +1,10 @@
 import api from "../api";
-import type { AddProjectRequest, Project } from "../models/Project";
+import type {
+    AddProjectRequest,
+    Project,
+    ProjectDetailPage,
+    ProjectOrders
+} from "../models/Project";
 
 const getProjects = async (clientId: number): Promise<Project[]> => {
     const response = await api.get(`/clients/${clientId}/projects`);
@@ -8,6 +13,16 @@ const getProjects = async (clientId: number): Promise<Project[]> => {
 
 const getProject = async (id: number): Promise<Project> => {
     const response = await api.get(`/projects/${id}`);
+    return response.data;
+};
+
+const getProjectDetails = async (projectId: number): Promise<ProjectDetailPage> => {
+    const response = await api.get(`/projects/${projectId}/details`);
+    return response.data;
+};
+
+const getProjectDetailOrders = async (projectDetailId: number): Promise<ProjectOrders> => {
+    const response = await api.get(`/project-details/${projectDetailId}/orders`);
     return response.data;
 };
 
@@ -34,6 +49,8 @@ const updateProject = async (
 export default {
     getProjects,
     getProject,
+    getProjectDetails,
+    getProjectDetailOrders,
     addProject,
     deleteProject,
     updateProject

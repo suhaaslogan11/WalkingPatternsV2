@@ -3,6 +3,7 @@ import ClientList from "./pages/clients/ClientList";
 import ClientForm from "./pages/clients/ClientForm";
 import ProjectList from "./pages/projects/ProjectList";
 import ProjectForm from "./pages/projects/ProjectForm";
+import ProjectDetail from "./pages/projects/ProjectDetail";
 import { ToastContainer } from "react-toastify";
 
 function App() {
@@ -34,6 +35,11 @@ function App() {
             <Route
                 path="/projects/edit/:id"
                 element={<ProjectForm />}
+            />
+
+            <Route
+                path="/projects/:projectId"
+                element={<ProjectDetail />}
             />
 
         </Routes>

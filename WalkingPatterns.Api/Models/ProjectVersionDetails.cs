@@ -29,5 +29,9 @@ namespace WalkingPatterns.Api.Models
         public double DiscountAmount { get; set; }
 
         public double DiscountedTotal { get; set; }
+
+        public ICollection<ProjectDetails> ProjectDetails { get; set; } = new List<ProjectDetails>();
+
+        public ICollection<OrderDetails> OrderDetails { get; set; } = new List<OrderDetails>();
     }
 }
