@@ -183,6 +183,19 @@ namespace WalkingPatterns.Api.Services
             };
         }
 
+        public async Task<bool> DeleteOrderAsync(int orderId)
+        {
+            var order = await _context.OrderDetails.FindAsync(orderId);
+
+            if (order == null)
+                return false;
+
+            _context.OrderDetails.Remove(order);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<ProjectResponse> AddProjectAsync(
             int clientId,
             AddProjectRequest request,

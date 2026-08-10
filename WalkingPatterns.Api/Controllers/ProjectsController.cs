@@ -92,6 +92,17 @@ namespace WalkingPatterns.Api.Controllers
             }
         }
 
+        [HttpDelete("orders/{orderId:int}")]
+        public async Task<IActionResult> DeleteOrder(int orderId)
+        {
+            var deleted = await _projectService.DeleteOrderAsync(orderId);
+
+            if (!deleted)
+                return NotFound(new { message = "Order not found." });
+
+            return NoContent();
+        }
+
         [HttpPost("clients/{clientId:int}/projects")]
         public async Task<IActionResult> AddProject(int clientId, AddProjectRequest request)
         {

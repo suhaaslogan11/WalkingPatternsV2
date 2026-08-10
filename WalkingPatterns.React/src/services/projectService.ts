@@ -42,6 +42,10 @@ const applyDiscount = async (
     return response.data;
 };
 
+const deleteOrder = async (orderId: number) => {
+    await api.delete(`/orders/${orderId}`);
+};
+
 const addProject = async (
     clientId: number,
     project: AddProjectRequest
@@ -69,6 +73,7 @@ export default {
     getProjectDetailOrders,
     getProjectFinancials,
     applyDiscount,
+    deleteOrder,
     addProject,
     deleteProject,
     updateProject

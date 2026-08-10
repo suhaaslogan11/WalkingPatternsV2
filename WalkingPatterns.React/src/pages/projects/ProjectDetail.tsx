@@ -91,6 +91,34 @@ function ProjectDetail() {
 
     };
 
+    const handleDeleteOrder = async (orderId: number) => {
+
+        if (!orders || !window.confirm("Are you sure you want to delete this order?"))
+            return;
+
+        try {
+
+            await projectService.deleteOrder(orderId);
+
+            const [updatedOrders, updatedFinancials] = await Promise.all([
+                projectService.getProjectDetailOrders(orders.projectDetailId),
+                projectService.getProjectFinancials(parsedProjectId)
+            ]);
+
+            setOrders(updatedOrders);
+            setFinancials(updatedFinancials);
+            toast.success("Order deleted successfully");
+
+        }
+        catch (error) {
+
+            console.error(error);
+            toast.error("Unable to delete order");
+
+        }
+
+    };
+
     if (!Number.isInteger(parsedProjectId) || parsedProjectId <= 0) {
         return (
             <div className="container mt-5">
@@ -243,6 +271,13 @@ function ProjectDetail() {
                                             <p><strong>Dimensions:</strong> {order.width || "N/A"} x {order.height || "N/A"} x {order.depth || "N/A"}</p>
                                             <p><strong>Accessories:</strong> {order.accessories || "N/A"}</p>
                                             <p><strong>Additional Items:</strong> {order.additionalItemName || "N/A"}</p>
+                                            <button
+                                                type="button"
+                                                className="btn btn-danger btn-sm mt-2"
+                                                onClick={() => handleDeleteOrder(order.orderId)}
+                                            >
+                                                Delete
+                                            </button>
                                             <p className="mb-0"><strong>Total:</strong> ₹{order.totalPrice.toFixed(2)}</p>
                                         </div>
                                     ))
