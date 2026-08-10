@@ -20,6 +20,14 @@ namespace WalkingPatterns.Api.Data
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<KitchenPriceDetails> KitchenPriceDetails { get; set; }
+
+        public DbSet<BedrromPriceDetails> BedromPriceDetails { get; set; }
+
+        public DbSet<OtherWoodworkPriceDetails> OtherWoodworkPriceDetails { get; set; }
+
+        public DbSet<HDSPriceDetails> HDSPriceDetails { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

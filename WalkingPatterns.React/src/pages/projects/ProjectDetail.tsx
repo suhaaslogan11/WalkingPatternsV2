@@ -5,7 +5,8 @@ import { toast } from "react-toastify";
 import type {
     ProjectDetailPage,
     ProjectFinancials,
-    ProjectOrders
+    ProjectOrders,
+    ProjectCartItem
 } from "../../models/Project";
 import projectService from "../../services/projectService";
 
@@ -21,6 +22,7 @@ function ProjectDetail() {
     const [details, setDetails] = useState<ProjectDetailPage>();
     const [financials, setFinancials] = useState<ProjectFinancials>();
     const [orders, setOrders] = useState<ProjectOrders | null>(null);
+    const [cartItems, setCartItems] = useState<ProjectCartItem[]>([]);
     const {
         register,
         handleSubmit,
@@ -37,11 +39,13 @@ function ProjectDetail() {
 
         void Promise.all([
             projectService.getProjectDetails(parsedProjectId),
-            projectService.getProjectFinancials(parsedProjectId)
+            projectService.getProjectFinancials(parsedProjectId),
+            projectService.getProjectCart(parsedProjectId)
         ])
-            .then(([projectDetails, projectFinancials]) => {
+            .then(([projectDetails, projectFinancials, projectCart]) => {
                 setDetails(projectDetails);
                 setFinancials(projectFinancials);
+                setCartItems(projectCart);
                 reset({ discountAmount: projectFinancials.discountAmount });
             })
             .catch((error) => {
@@ -148,6 +152,22 @@ function ProjectDetail() {
 
     };
 
+    const handleDeleteCartItem = async (item: ProjectCartItem) => {
+        if (!window.confirm("Are you sure you want to remove this cart item?"))
+            return;
+
+        try {
+            await projectService.deleteProjectCartItem(parsedProjectId, item.source, item.id);
+            const updatedCart = await projectService.getProjectCart(parsedProjectId);
+            setCartItems(updatedCart);
+            toast.success("Cart item deleted successfully");
+        }
+        catch (error) {
+            console.error(error);
+            toast.error("Unable to delete cart item");
+        }
+    };
+
     if (!Number.isInteger(parsedProjectId) || parsedProjectId <= 0) {
         return (
             <div className="container mt-5">
@@ -226,6 +246,59 @@ function ProjectDetail() {
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <div className="card shadow mb-4">
+                <div className="card-header d-flex justify-content-between align-items-center">
+                    <h4 className="mb-0">Cart</h4>
+                    <button
+                        type="button"
+                        className="btn btn-outline-primary btn-sm"
+                        onClick={() => void projectService.getProjectCart(parsedProjectId).then(setCartItems)}
+                    >
+                        Refresh
+                    </button>
+                </div>
+                <div className="card-body">
+                    {cartItems.length === 0 ? (
+                        <p className="mb-0">No cart items found.</p>
+                    ) : (
+                        <div className="table-responsive">
+                            <table className="table table-striped table-bordered mb-0">
+                                <thead className="table-light">
+                                    <tr>
+                                        <th>Source</th>
+                                        <th>Room/Utility</th>
+                                        <th>Material</th>
+                                        <th>Dimensions</th>
+                                        <th>Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {cartItems.map((item) => (
+                                        <tr key={`${item.source}-${item.id}`}>
+                                            <td>{item.source}</td>
+                                            <td>{item.utilityName || item.utilityNameOld || "N/A"}</td>
+                                            <td>{item.materials || "N/A"}</td>
+                                            <td>{item.width || "N/A"} x {item.height || "N/A"} x {item.depth || "N/A"}</td>
+                                            <td>₹{item.totalPrice.toFixed(2)}</td>
+                                            <td>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => void handleDeleteCartItem(item)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
             </div>
 

@@ -65,3 +65,28 @@ export interface ProjectFinancials {
     discountAmount: number;
     discountedTotal: number;
 }
+
+export type ProjectCartSource = "Kitchen" | "Bedroom" | "OtherWoodwork" | "HDS";
+
+export interface ProjectCartItem {
+    id: number;
+    source: ProjectCartSource;
+    parent?: string;
+    utilityName?: string;
+    utilityNameOld?: string;
+    projectName?: string;
+    width?: string;
+    height?: string;
+    depth?: string;
+    materials?: string;
+    accessories?: string;
+    quantities?: string;
+    additionalItemName?: string;
+    additionalItemsAmounts?: string;
+    additionalItemsQuantities?: string;
+    materialTotal: number;
+    accessoriesTotal: number;
+    additionalItemsTotal: number;
+    totalPrice: number;
+    createdAt: string;
+}

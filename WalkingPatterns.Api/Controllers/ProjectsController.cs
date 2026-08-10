@@ -48,6 +48,31 @@ namespace WalkingPatterns.Api.Controllers
             return Ok(details);
         }
 
+        [HttpGet("projects/{projectId:int}/cart")]
+        public async Task<IActionResult> GetProjectCart(int projectId)
+        {
+            var cart = await _projectService.GetProjectCartAsync(projectId);
+
+            if (cart == null)
+                return NotFound(new { message = "Project not found." });
+
+            return Ok(cart);
+        }
+
+        [HttpDelete("projects/{projectId:int}/cart/{source}/{itemId:int}")]
+        public async Task<IActionResult> DeleteProjectCartItem(int projectId, string source, int itemId)
+        {
+            if (source is not ("Kitchen" or "Bedroom" or "OtherWoodwork" or "HDS"))
+                return BadRequest(new { message = "Invalid cart item source." });
+
+            var deleted = await _projectService.DeleteProjectCartItemAsync(projectId, source, itemId);
+
+            if (!deleted)
+                return NotFound(new { message = "Cart item not found." });
+
+            return NoContent();
+        }
+
         [HttpGet("project-details/{projectDetailId:int}/orders")]
         public async Task<IActionResult> GetProjectDetailOrders(int projectDetailId)
         {

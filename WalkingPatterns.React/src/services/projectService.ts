@@ -4,7 +4,9 @@ import type {
     Project,
     ProjectDetailPage,
     ProjectFinancials,
-    ProjectOrders
+    ProjectOrders,
+    ProjectCartItem,
+    ProjectCartSource
 } from "../models/Project";
 
 const getProjects = async (clientId: number): Promise<Project[]> => {
@@ -50,6 +52,19 @@ const deleteProjectModule = async (projectId: number, projectDetailId: number) =
     await api.delete(`/projects/${projectId}/modules/${projectDetailId}`);
 };
 
+const getProjectCart = async (projectId: number): Promise<ProjectCartItem[]> => {
+    const response = await api.get(`/projects/${projectId}/cart`);
+    return response.data;
+};
+
+const deleteProjectCartItem = async (
+    projectId: number,
+    source: ProjectCartSource,
+    itemId: number
+) => {
+    await api.delete(`/projects/${projectId}/cart/${source}/${itemId}`);
+};
+
 const addProject = async (
     clientId: number,
     project: AddProjectRequest
@@ -79,6 +94,8 @@ export default {
     applyDiscount,
     deleteOrder,
     deleteProjectModule,
+    getProjectCart,
+    deleteProjectCartItem,
     addProject,
     deleteProject,
     updateProject

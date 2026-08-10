@@ -14,6 +14,8 @@ namespace WalkingPatterns.Api.Interfaces
         Task<ProjectFinancialResponse?> ApplyDiscountAsync(int projectId, double discountAmount);
         Task<bool> DeleteOrderAsync(int orderId);
         Task<bool> DeleteProjectModuleAsync(int projectId, int projectDetailId);
+        Task<List<ProjectCartItemResponse>?> GetProjectCartAsync(int projectId);
+        Task<bool> DeleteProjectCartItemAsync(int projectId, string source, int itemId);
         Task<ProjectResponse> AddProjectAsync(int clientId, AddProjectRequest request, string storedProjectDate);
         Task<ProjectResponse?> UpdateProjectAsync(int id, AddProjectRequest request, string storedProjectDate);
         Task<bool> DeleteProjectAsync(int id);

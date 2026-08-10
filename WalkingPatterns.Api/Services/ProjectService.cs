@@ -230,6 +230,128 @@ namespace WalkingPatterns.Api.Services
             return true;
         }
 
+        public async Task<List<ProjectCartItemResponse>?> GetProjectCartAsync(int projectId)
+        {
+            var projectName = await _context.ProjectVersionDetails
+                .Where(project => project.Id == projectId)
+                .Select(project => project.ProjectName)
+                .SingleOrDefaultAsync();
+
+            if (projectName == null)
+                return null;
+
+            var items = new List<ProjectCartItemResponse>();
+
+            var kitchen = await _context.KitchenPriceDetails.AsNoTracking()
+                .Where(item => item.ProjectName == projectName)
+                .OrderByDescending(item => item.CreatedAt)
+                .ToListAsync();
+            items.AddRange(kitchen.Select(item => new ProjectCartItemResponse
+            {
+                Id = item.Id, Source = "Kitchen", Parent = item.Parent,
+                UtilityName = item.UtilityName, UtilityNameOld = item.UtilityNameOld,
+                ProjectName = item.ProjectName, Width = item.Width, Height = item.Height, Depth = item.Depth,
+                Materials = item.Materials, Accessories = item.Accessories, Quantities = item.Quantities,
+                AdditionalItemName = item.AdditionalItemName, AdditionalItemsAmounts = item.AdditionalItemsAmounts,
+                AdditionalItemsQuantities = item.AdditionalItemsQuantities,
+                MaterialTotal = item.MaterialTotal ?? 0, AccessoriesTotal = item.AccessoriesTotal ?? 0,
+                AdditionalItemsTotal = item.AdditionalItemsTotal ?? 0, TotalPrice = item.TotalPrice ?? 0,
+                CreatedAt = item.CreatedAt
+            }));
+
+            var bedroom = await _context.BedromPriceDetails.AsNoTracking()
+                .Where(item => item.ProjectName == projectName)
+                .OrderByDescending(item => item.CreatedAt)
+                .ToListAsync();
+            items.AddRange(bedroom.Select(item => MapCartItem(item.Id, "Bedroom", item.Parent, item.UtilityName,
+                item.UtilityNameOld, item.ProjectName, item.Width, item.Height, item.Depth, item.Materials, null, null,
+                item.AdditionalItemName, item.AdditionalItemsAmounts, item.AdditionalItemsQuantities,
+                item.MaterialTotal, 0, item.AdditionalItemsTotal, item.TotalPrice, item.CreatedAt)));
+
+            var other = await _context.OtherWoodworkPriceDetails.AsNoTracking()
+                .Where(item => item.ProjectName == projectName)
+                .OrderByDescending(item => item.CreatedAt)
+                .ToListAsync();
+            items.AddRange(other.Select(item => MapCartItem(item.Id, "OtherWoodwork", item.Parent, item.UtilityName,
+                item.UtilityNameOld, item.ProjectName, item.Width, item.Height, item.Depth, item.Materials, null, null,
+                item.AdditionalItemName, item.AdditionalItemsAmounts, item.AdditionalItemsQuantities,
+                item.MaterialTotal, 0, item.AdditionalItemsTotal, item.TotalPrice, item.CreatedAt)));
+
+            var hds = await _context.HDSPriceDetails.AsNoTracking()
+                .Where(item => item.ProjectName == projectName)
+                .OrderByDescending(item => item.CreatedAt)
+                .ToListAsync();
+            items.AddRange(hds.Select(item => MapCartItem(item.Id, "HDS", item.Parent, item.UtilityName,
+                item.UtilityNameOld, item.ProjectName, item.Width, item.Height, item.Depth, item.Materials, null, null,
+                item.AdditionalItemName, item.AdditionalItemsAmounts, item.AdditionalItemsQuantities,
+                item.MaterialTotal, 0, item.AdditionalItemsTotal, item.TotalPrice, item.CreatedAt)));
+
+            return items.OrderByDescending(item => item.CreatedAt).ToList();
+        }
+
+        public async Task<bool> DeleteProjectCartItemAsync(int projectId, string source, int itemId)
+        {
+            var projectName = await _context.ProjectVersionDetails
+                .Where(project => project.Id == projectId)
+                .Select(project => project.ProjectName)
+                .SingleOrDefaultAsync();
+
+            if (projectName == null)
+                return false;
+
+            switch (source)
+            {
+                case "Kitchen":
+                    var kitchen = await _context.KitchenPriceDetails
+                        .SingleOrDefaultAsync(item => item.Id == itemId && item.ProjectName == projectName);
+                    if (kitchen == null) return false;
+                    _context.KitchenPriceDetails.Remove(kitchen);
+                    break;
+                case "Bedroom":
+                    var bedroom = await _context.BedromPriceDetails
+                        .SingleOrDefaultAsync(item => item.Id == itemId && item.ProjectName == projectName);
+                    if (bedroom == null) return false;
+                    _context.BedromPriceDetails.Remove(bedroom);
+                    break;
+                case "OtherWoodwork":
+                    var other = await _context.OtherWoodworkPriceDetails
+                        .SingleOrDefaultAsync(item => item.Id == itemId && item.ProjectName == projectName);
+                    if (other == null) return false;
+                    _context.OtherWoodworkPriceDetails.Remove(other);
+                    break;
+                case "HDS":
+                    var hds = await _context.HDSPriceDetails
+                        .SingleOrDefaultAsync(item => item.Id == itemId && item.ProjectName == projectName);
+                    if (hds == null) return false;
+                    _context.HDSPriceDetails.Remove(hds);
+                    break;
+                default:
+                    return false;
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        private static ProjectCartItemResponse MapCartItem(
+            int id, string source, string? parent, string? utilityName, string? utilityNameOld,
+            string? projectName, string? width, string? height, string? depth, string? materials,
+            string? accessories, string? quantities, string? additionalItemName, string? additionalItemsAmounts,
+            string? additionalItemsQuantities, double materialTotal, double accessoriesTotal,
+            double additionalItemsTotal, double totalPrice, DateTime createdAt)
+        {
+            return new ProjectCartItemResponse
+            {
+                Id = id, Source = source, Parent = parent, UtilityName = utilityName,
+                UtilityNameOld = utilityNameOld, ProjectName = projectName, Width = width, Height = height,
+                Depth = depth, Materials = materials, Accessories = accessories, Quantities = quantities,
+                AdditionalItemName = additionalItemName, AdditionalItemsAmounts = additionalItemsAmounts,
+                AdditionalItemsQuantities = additionalItemsQuantities, MaterialTotal = materialTotal,
+                AccessoriesTotal = accessoriesTotal, AdditionalItemsTotal = additionalItemsTotal,
+                TotalPrice = totalPrice, CreatedAt = createdAt
+            };
+        }
+
         public async Task<ProjectResponse> AddProjectAsync(
             int clientId,
             AddProjectRequest request,
