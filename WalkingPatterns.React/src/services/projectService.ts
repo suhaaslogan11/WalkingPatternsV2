@@ -6,7 +6,8 @@ import type {
     ProjectFinancials,
     ProjectOrders,
     ProjectCartItem,
-    ProjectCartSource
+    ProjectCartSource,
+    ProjectCheckoutResponse
 } from "../models/Project";
 
 const getProjects = async (clientId: number): Promise<Project[]> => {
@@ -65,6 +66,11 @@ const deleteProjectCartItem = async (
     await api.delete(`/projects/${projectId}/cart/${source}/${itemId}`);
 };
 
+const checkoutProject = async (projectId: number): Promise<ProjectCheckoutResponse> => {
+    const response = await api.post(`/projects/${projectId}/checkout`);
+    return response.data;
+};
+
 const addProject = async (
     clientId: number,
     project: AddProjectRequest
@@ -96,6 +102,7 @@ export default {
     deleteProjectModule,
     getProjectCart,
     deleteProjectCartItem,
+    checkoutProject,
     addProject,
     deleteProject,
     updateProject

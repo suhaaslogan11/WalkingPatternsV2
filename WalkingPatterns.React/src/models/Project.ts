@@ -90,3 +90,12 @@ export interface ProjectCartItem {
     totalPrice: number;
     createdAt: string;
 }
+
+export interface ProjectCheckoutResponse {
+    checkedOutItemCount: number;
+    cartTotal: number;
+    grandTotal: number;
+    discountAmount: number;
+    discountedTotal: number;
+    versionNumber: string;
+}

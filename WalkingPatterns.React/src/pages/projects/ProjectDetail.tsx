@@ -6,7 +6,8 @@ import type {
     ProjectDetailPage,
     ProjectFinancials,
     ProjectOrders,
-    ProjectCartItem
+    ProjectCartItem,
+    ProjectCheckoutResponse
 } from "../../models/Project";
 import projectService from "../../services/projectService";
 
@@ -23,6 +24,7 @@ function ProjectDetail() {
     const [financials, setFinancials] = useState<ProjectFinancials>();
     const [orders, setOrders] = useState<ProjectOrders | null>(null);
     const [cartItems, setCartItems] = useState<ProjectCartItem[]>([]);
+    const [checkoutResult, setCheckoutResult] = useState<ProjectCheckoutResponse | null>(null);
     const {
         register,
         handleSubmit,
@@ -168,6 +170,30 @@ function ProjectDetail() {
         }
     };
 
+    const handleCheckout = async () => {
+        if (cartItems.length === 0 || !window.confirm("Are you sure you want to checkout this cart?"))
+            return;
+
+        try {
+            const result = await projectService.checkoutProject(parsedProjectId);
+            const [updatedDetails, updatedFinancials, updatedCart] = await Promise.all([
+                projectService.getProjectDetails(parsedProjectId),
+                projectService.getProjectFinancials(parsedProjectId),
+                projectService.getProjectCart(parsedProjectId)
+            ]);
+
+            setDetails(updatedDetails);
+            setFinancials(updatedFinancials);
+            setCartItems(updatedCart);
+            setCheckoutResult(result);
+            toast.success("Project checkout completed successfully");
+        }
+        catch (error) {
+            console.error(error);
+            toast.error("Unable to checkout project cart");
+        }
+    };
+
     if (!Number.isInteger(parsedProjectId) || parsedProjectId <= 0) {
         return (
             <div className="container mt-5">
@@ -252,13 +278,23 @@ function ProjectDetail() {
             <div className="card shadow mb-4">
                 <div className="card-header d-flex justify-content-between align-items-center">
                     <h4 className="mb-0">Cart</h4>
-                    <button
-                        type="button"
-                        className="btn btn-outline-primary btn-sm"
-                        onClick={() => void projectService.getProjectCart(parsedProjectId).then(setCartItems)}
-                    >
-                        Refresh
-                    </button>
+                    <div>
+                        <button
+                            type="button"
+                            className="btn btn-outline-primary btn-sm me-2"
+                            onClick={() => void projectService.getProjectCart(parsedProjectId).then(setCartItems)}
+                        >
+                            Refresh
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-success btn-sm"
+                            disabled={cartItems.length === 0}
+                            onClick={() => void handleCheckout()}
+                        >
+                            Checkout
+                        </button>
+                    </div>
                 </div>
                 <div className="card-body">
                     {cartItems.length === 0 ? (
@@ -297,6 +333,14 @@ function ProjectDetail() {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                    )}
+                    {checkoutResult && (
+                        <div className="alert alert-success mt-3 mb-0">
+                            <strong>Checkout complete:</strong>{" "}
+                            {checkoutResult.checkedOutItemCount} item(s), cart total ₹{checkoutResult.cartTotal.toFixed(2)},{" "}
+                            grand total ₹{checkoutResult.grandTotal.toFixed(2)}, discount ₹{checkoutResult.discountAmount.toFixed(2)},{" "}
+                            discounted total ₹{checkoutResult.discountedTotal.toFixed(2)}, version {checkoutResult.versionNumber}.
                         </div>
                     )}
                 </div>
