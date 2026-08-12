@@ -20,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IClientService, ClientService>();
 
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IKitchenPricingService, KitchenPricingService>();
 
 builder.Services.AddScoped<JwtService>();
 

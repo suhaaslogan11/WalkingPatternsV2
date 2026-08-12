@@ -1,0 +1,277 @@
+{
+  "materials": {
+    "Laminate": 3000,
+    "Acrylic": 4200,
+    "Duco": 5200,
+    "Clear Glass": 3800,
+    "Frosted Glass": 4000,
+    "Lacquered Glass": 4800,
+    "BPO": 10500,
+    "Open Unit": 3800,
+    "RO Unit": 2500
+  },
+  "parentOptions": {
+    "Base Shutter Unit": [
+      {
+        "name": "Wooden Shelf",
+        "price": 800
+      },
+      {
+        "name": "Glass Shelf",
+        "price": 900
+      },
+      {
+        "name": "Internal Drawer (3set)",
+        "price": 8500
+      }
+    ],
+    "Base Sink Unit": [
+      {
+        "name": "DustBin",
+        "price": 4200
+      },
+      {
+        "name": "Detergent Pull Out",
+        "price": 2800
+      },
+      {
+        "name": "Drawer sink Basket",
+        "price": 4200
+      }
+    ],
+    "Base L Corner": [
+      {
+        "name": "Wooden Shelf",
+        "price": 800
+      },
+      {
+        "name": "EveryDay Corner Corousel",
+        "price": 10400
+      },
+      {
+        "name": "Hettich Corner",
+        "price": 28000
+      }
+    ],
+    "Wall Shutter Unit": [
+      {
+        "name": "Wooden Shelf",
+        "price": 800
+      },
+      {
+        "name": "Glass Shelf",
+        "price": 900
+      }
+    ],
+    "Wall RO Unit": [
+      {
+        "name": "N/A",
+        "price": 1
+      }
+
+    ],
+    "Base Blind Corner": [
+      {
+        "name": "Wooden Shelf",
+        "price": "800"
+      },
+      {
+        "name": "Hettich Magic corner",
+        "price": "36400"
+      },
+      {
+        "name": "Hettich Cargo man",
+        "price": "42000"
+      },
+      {
+        "name": "Blind Corner pull out (Everyday)",
+        "price": "16800"
+      },
+      {
+        "name": "Dee Tray Corner",
+        "price": "7900"
+      }
+    ],
+    "Tall Units": [
+      {
+        "name": "Wooden Shelf",
+        "price": "800"
+      },
+      {
+        "name": "Glass Shelf",
+        "price": "900"
+      },
+      {
+        "name": "Hettich Innotech (small)",
+        "price": "4800"
+      },
+      {
+        "name": "Hettich Innotech (Big)",
+        "price": "7200"
+      },
+      {
+        "name": "Wicker Basket",
+        "price": "8500"
+      }
+    ],
+    "Base Bottle pullout Draw": [
+      {
+        "name": "Hettich BPO Solid Base",
+        "price": "6800"
+      }
+
+    ],
+    "Base HOB Draw": [
+      {
+        "name": "Everyday Wire Basket(small)",
+        "price": "2800"
+      },
+      {
+        "name": "Everyday Wire Basket(big)",
+        "price": "3800"
+      },
+      {
+        "name": "Hettich Innotech (small)",
+        "price": "4800"
+      },
+      {
+        "name": "Hettich Innotech (Big)",
+        "price": "7200"
+      },
+      {
+        "name": "Hettich PVC Cuttery Partition",
+        "price": "5200"
+      },
+      {
+        "name": "Hettich Taali Basket",
+        "price": "5000"
+      }
+    ],
+    "Base single Drawer with internal draw": [
+      {
+        "name": "Hettich Deep Internal",
+        "price": "13800"
+      },
+      {
+        "name": "Hettich Drawer set",
+        "price": "13800"
+      }
+    ],
+    "Base double drawer": [
+      {
+        "name": "Hettich Innotech (Big)",
+        "price": "7200"
+      }
+    ],
+    "Base double drawer (1 small,1 big)": [
+      {
+        "name": "Hettich Innotech (small)",
+        "price": "4800"
+      },
+      {
+        "name": "Hettich Innotech (Big)",
+        "price": "7200"
+      }
+    ],
+    "Base Single drawer": [
+      {
+        "name": "Hettich Innotech (Big)",
+        "price": "7200"
+      },
+      {
+        "name": "Everyday Wire Basket(big)",
+        "price": "3800"
+      }
+    ],
+    "Base Open Unit with Drawer": [
+      {
+        "name": "Spitze wicker Basket",
+        "price": "8500"
+      },
+      {
+        "name": "Hettich Innotech (Big)",
+        "price": "7200"
+      }
+    ],
+    "Base Open Unit with Shelves": [
+      {
+        "name": "Wooden Shelf",
+        "price": 1600
+      },
+      {
+        "name": "Spitze wicker Basket",
+        "price": "8500"
+      }
+    ],
+    "Wall Top Lift Up": [
+      {
+        "name": "Wooden Shelf",
+        "price": 800
+      },
+      {
+        "name": "Glass Shelf",
+        "price": 900
+      }
+    ],
+    "Wall L Corner": [
+      {
+        "name": "Wooden Shelf",
+        "price": 800
+      }
+    ],
+    "Wall Open Unit": [
+      {
+        "name": "Colored Wooden",
+        "price": 2400
+      }
+    ],
+    "Wall Tambour Unit": [
+      {
+        "name": "Wooden Shelf",
+        "price": 800
+      },
+      {
+        "name": "Glass Shelf",
+        "price": 900
+      }
+    ],
+    "Wall Microwave Unit": [
+      {
+        "name": "Wooden Shelf",
+        "price": 800
+      },
+      {
+        "name": "Glass Shelf",
+        "price": 900
+      }
+    ],
+    "Others": [
+      {
+        "name": "Loft Shutters",
+        "price": 1500
+      },
+      {
+        "name": "Loft Side Panel",
+        "price": 1100
+      },
+      {
+        "name": "Loft Bottom Panel",
+        "price": 1600
+      },
+      {
+        "name": "Breakfast Table",
+        "price": 3800
+      },
+      {
+        "name": "Fillers",
+        "price": 500
+      },
+      {
+        "name": "Shelves",
+        "price": 1700
+      }
+
+    ]
+
+  }
+}
