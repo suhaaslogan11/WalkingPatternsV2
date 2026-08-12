@@ -53,6 +53,16 @@ const deleteProjectModule = async (projectId: number, projectDetailId: number) =
     await api.delete(`/projects/${projectId}/modules/${projectDetailId}`);
 };
 
+const renameProjectModule = async (
+    projectId: number,
+    projectDetailId: number,
+    newRoomName: string
+) => {
+    await api.put(`/projects/${projectId}/modules/${projectDetailId}/room-name`, {
+        newRoomName
+    });
+};
+
 const getProjectCart = async (projectId: number): Promise<ProjectCartItem[]> => {
     const response = await api.get(`/projects/${projectId}/cart`);
     return response.data;
@@ -100,6 +110,7 @@ export default {
     applyDiscount,
     deleteOrder,
     deleteProjectModule,
+    renameProjectModule,
     getProjectCart,
     deleteProjectCartItem,
     checkoutProject,

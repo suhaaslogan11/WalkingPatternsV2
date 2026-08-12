@@ -231,6 +231,44 @@ namespace WalkingPatterns.Api.Services
             return true;
         }
 
+        public async Task<bool> RenameProjectModuleAsync(int projectId, int projectDetailId, string newRoomName)
+        {
+            var selectedDetail = await _context.ProjectDetails
+                .SingleOrDefaultAsync(detail => detail.Id == projectDetailId && detail.ProjectId == projectId);
+
+            if (selectedDetail == null)
+                return false;
+
+            var currentRoomName = selectedDetail.RoomName;
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            var projectDetails = await _context.ProjectDetails
+                .Where(detail => detail.ProjectId == projectId && detail.RoomName == currentRoomName)
+                .ToListAsync();
+
+            var relatedOrders = await _context.OrderDetails
+                .Where(order =>
+                    order.ProjectVersionDetailsId == projectId &&
+                    order.ProjectId == projectId &&
+                    (order.UtilityName == currentRoomName || order.UtilityNameOld == currentRoomName))
+                .ToListAsync();
+
+            foreach (var detail in projectDetails)
+                detail.RoomName = newRoomName;
+
+            foreach (var order in relatedOrders)
+            {
+                if (order.UtilityName == currentRoomName)
+                    order.UtilityName = newRoomName;
+                if (order.UtilityNameOld == currentRoomName)
+                    order.UtilityNameOld = newRoomName;
+            }
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return true;
+        }
+
         public async Task<List<ProjectCartItemResponse>?> GetProjectCartAsync(int projectId)
         {
             var projectName = await _context.ProjectVersionDetails

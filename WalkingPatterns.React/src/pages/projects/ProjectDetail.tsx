@@ -25,6 +25,8 @@ function ProjectDetail() {
     const [orders, setOrders] = useState<ProjectOrders | null>(null);
     const [cartItems, setCartItems] = useState<ProjectCartItem[]>([]);
     const [checkoutResult, setCheckoutResult] = useState<ProjectCheckoutResponse | null>(null);
+    const [renamingModuleId, setRenamingModuleId] = useState<number | null>(null);
+    const [newRoomName, setNewRoomName] = useState("");
     const {
         register,
         handleSubmit,
@@ -152,6 +154,36 @@ function ProjectDetail() {
 
         }
 
+    };
+
+    const handleRenameModule = async (projectDetailId: number) => {
+        if (!newRoomName.trim()) {
+            toast.error("Room name is required");
+            return;
+        }
+
+        try {
+            await projectService.renameProjectModule(
+                parsedProjectId,
+                projectDetailId,
+                newRoomName.trim()
+            );
+
+            const updatedDetails = await projectService.getProjectDetails(parsedProjectId);
+            setDetails(updatedDetails);
+
+            if (orders?.projectDetailId === projectDetailId) {
+                setOrders(await projectService.getProjectDetailOrders(projectDetailId));
+            }
+
+            setRenamingModuleId(null);
+            setNewRoomName("");
+            toast.success("Module renamed successfully");
+        }
+        catch (error) {
+            console.error(error);
+            toast.error("Unable to rename module");
+        }
     };
 
     const handleDeleteCartItem = async (item: ProjectCartItem) => {
@@ -378,6 +410,41 @@ function ProjectDetail() {
                                         <td>{module.services.toFixed(2)}</td>
                                         <td>{module.total.toFixed(2)}</td>
                                         <td>
+                                            {renamingModuleId === module.projectDetailId ? (
+                                                <div className="input-group input-group-sm mb-2">
+                                                    <input
+                                                        className="form-control"
+                                                        value={newRoomName}
+                                                        onChange={(event) => setNewRoomName(event.target.value)}
+                                                        placeholder="New room name"
+                                                    />
+                                                    <button
+                                                        className="btn btn-success"
+                                                        onClick={() => void handleRenameModule(module.projectDetailId)}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-secondary"
+                                                        onClick={() => {
+                                                            setRenamingModuleId(null);
+                                                            setNewRoomName("");
+                                                        }}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    className="btn btn-outline-secondary btn-sm"
+                                                    onClick={() => {
+                                                        setRenamingModuleId(module.projectDetailId);
+                                                        setNewRoomName(module.roomName);
+                                                    }}
+                                                >
+                                                    Rename
+                                                </button>
+                                            )}
                                             <button
                                                 className="btn btn-primary btn-sm"
                                                 onClick={() => handleViewOrders(module.projectDetailId)}

@@ -159,6 +159,26 @@ namespace WalkingPatterns.Api.Controllers
             return NoContent();
         }
 
+        [HttpPut("projects/{projectId:int}/modules/{projectDetailId:int}/room-name")]
+        public async Task<IActionResult> RenameProjectModule(
+            int projectId,
+            int projectDetailId,
+            RenameProjectModuleRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.NewRoomName))
+                return BadRequest(new { message = "Room name is required." });
+
+            var renamed = await _projectService.RenameProjectModuleAsync(
+                projectId,
+                projectDetailId,
+                request.NewRoomName.Trim());
+
+            if (!renamed)
+                return NotFound(new { message = "Project module not found." });
+
+            return NoContent();
+        }
+
         [HttpPost("clients/{clientId:int}/projects")]
         public async Task<IActionResult> AddProject(int clientId, AddProjectRequest request)
         {
