@@ -73,6 +73,24 @@ namespace WalkingPatterns.Api.Controllers
             return NoContent();
         }
 
+        [HttpPost("projects/{projectId:int}/checkout")]
+        public async Task<IActionResult> CheckoutProject(int projectId)
+        {
+            try
+            {
+                var checkout = await _projectService.CheckoutProjectAsync(projectId);
+
+                if (checkout == null)
+                    return NotFound(new { message = "Project not found." });
+
+                return Ok(checkout);
+            }
+            catch (InvalidOperationException exception)
+            {
+                return BadRequest(new { message = exception.Message });
+            }
+        }
+
         [HttpGet("project-details/{projectDetailId:int}/orders")]
         public async Task<IActionResult> GetProjectDetailOrders(int projectDetailId)
         {

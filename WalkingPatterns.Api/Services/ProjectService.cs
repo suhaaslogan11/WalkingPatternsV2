@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using WalkingPatterns.Api.Data;
 using WalkingPatterns.Api.DTOs;
@@ -331,6 +332,184 @@ namespace WalkingPatterns.Api.Services
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<ProjectCheckoutResponse?> CheckoutProjectAsync(int projectId)
+        {
+            var project = await _context.ProjectVersionDetails
+                .SingleOrDefaultAsync(item => item.Id == projectId);
+
+            if (project == null)
+                return null;
+
+            var kitchen = await _context.KitchenPriceDetails
+                .Where(item => item.ProjectName == project.ProjectName)
+                .ToListAsync();
+            var bedroom = await _context.BedromPriceDetails
+                .Where(item => item.ProjectName == project.ProjectName)
+                .ToListAsync();
+            var other = await _context.OtherWoodworkPriceDetails
+                .Where(item => item.ProjectName == project.ProjectName)
+                .ToListAsync();
+            var hds = await _context.HDSPriceDetails
+                .Where(item => item.ProjectName == project.ProjectName)
+                .ToListAsync();
+
+            var cartTotal = kitchen.Sum(item => item.TotalPrice ?? 0)
+                + bedroom.Sum(item => item.TotalPrice)
+                + other.Sum(item => item.TotalPrice)
+                + hds.Sum(item => item.TotalPrice);
+            var itemCount = kitchen.Count + bedroom.Count + other.Count + hds.Count;
+
+            if (itemCount == 0)
+                throw new InvalidOperationException("The project cart is empty.");
+
+            var hasExistingCheckout = await _context.ProjectDetails
+                .AnyAsync(detail => detail.ProjectId == projectId);
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            foreach (var item in kitchen)
+            {
+                AddCheckoutRows(
+                    project,
+                    item.Parent,
+                    item.UtilityName,
+                    item.UtilityNameOld,
+                    item.Width,
+                    item.Height,
+                    item.Depth,
+                    item.Materials,
+                    item.Accessories,
+                    item.Quantities,
+                    item.AdditionalItemName,
+                    item.AdditionalItemsAmounts,
+                    item.AdditionalItemsQuantities,
+                    item.MaterialTotal ?? 0,
+                    item.AccessoriesTotal ?? 0,
+                    item.AdditionalItemsTotal ?? 0,
+                    item.TotalPrice ?? 0);
+            }
+
+            foreach (var item in bedroom)
+                AddCheckoutRows(project, item.Parent, item.UtilityName, item.UtilityNameOld, item.Width, item.Height,
+                    item.Depth, item.Materials, null, null, item.AdditionalItemName, item.AdditionalItemsAmounts,
+                    item.AdditionalItemsQuantities, item.MaterialTotal, 0, item.AdditionalItemsTotal, item.TotalPrice);
+
+            foreach (var item in other)
+                AddCheckoutRows(project, item.Parent, item.UtilityName, item.UtilityNameOld, item.Width, item.Height,
+                    item.Depth, item.Materials, null, null, item.AdditionalItemName, item.AdditionalItemsAmounts,
+                    item.AdditionalItemsQuantities, item.MaterialTotal, 0, item.AdditionalItemsTotal, item.TotalPrice);
+
+            foreach (var item in hds)
+                AddCheckoutRows(project, item.Parent, item.UtilityName, item.UtilityNameOld, item.Width, item.Height,
+                    item.Depth, item.Materials, null, null, item.AdditionalItemName, item.AdditionalItemsAmounts,
+                    item.AdditionalItemsQuantities, item.MaterialTotal, 0, item.AdditionalItemsTotal, item.TotalPrice);
+
+            _context.KitchenPriceDetails.RemoveRange(kitchen);
+            _context.BedromPriceDetails.RemoveRange(bedroom);
+            _context.OtherWoodworkPriceDetails.RemoveRange(other);
+            _context.HDSPriceDetails.RemoveRange(hds);
+
+            await _context.SaveChangesAsync();
+
+            var grandTotal = await _context.OrderDetails
+                .Where(order => order.ProjectVersionDetailsId == projectId)
+                .SumAsync(order => order.TotalPrice);
+
+            var discountAmount = project.DiscountAmount;
+            if (double.IsNaN(discountAmount) || double.IsInfinity(discountAmount) || discountAmount < 0)
+                discountAmount = 0;
+            else if (discountAmount > grandTotal)
+                discountAmount = grandTotal;
+            project.GrandTotal = grandTotal;
+            project.DiscountAmount = discountAmount;
+            project.DiscountedTotal = grandTotal - discountAmount;
+            project.VersionNumber = IncrementCheckoutVersion(project.VersionNumber, hasExistingCheckout);
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return new ProjectCheckoutResponse
+            {
+                CheckedOutItemCount = itemCount,
+                CartTotal = cartTotal,
+                GrandTotal = project.GrandTotal,
+                DiscountAmount = project.DiscountAmount,
+                DiscountedTotal = project.DiscountedTotal,
+                VersionNumber = project.VersionNumber
+            };
+        }
+
+        private void AddCheckoutRows(
+            ProjectVersionDetails project, string? parent, string? utilityName, string? utilityNameOld,
+            string? width, string? height, string? depth, string? materials, string? accessories,
+            string? quantities, string? additionalItemName, string? additionalItemsAmounts,
+            string? additionalItemsQuantities, double materialTotal, double accessoriesTotal,
+            double additionalItemsTotal, double totalPrice)
+        {
+            var roomName = utilityName ?? utilityNameOld ?? string.Empty;
+            _context.ProjectDetails.Add(new ProjectDetails
+            {
+                ProjectId = project.Id,
+                RoomName = roomName,
+                Woodwork = materialTotal.ToString(CultureInfo.InvariantCulture),
+                Accessories = accessoriesTotal.ToString(CultureInfo.InvariantCulture),
+                Services = additionalItemsTotal.ToString(CultureInfo.InvariantCulture),
+                Total = totalPrice.ToString(CultureInfo.InvariantCulture),
+                Width = width ?? string.Empty,
+                Height = height ?? string.Empty,
+                Depth = depth ?? string.Empty
+            });
+
+            _context.OrderDetails.Add(new OrderDetails
+            {
+                ProjectVersionDetailsId = project.Id,
+                ProjectId = project.Id,
+                ProjectName = project.ProjectName,
+                Parent = parent,
+                UtilityName = utilityName,
+                UtilityNameOld = utilityNameOld,
+                Materials = materials,
+                Accessories = accessories,
+                Quantities = quantities,
+                AdditionalItemName = additionalItemName,
+                AdditionalItemsAmounts = additionalItemsAmounts,
+                AdditionalItemsQuantities = additionalItemsQuantities,
+                MaterialTotal = materialTotal,
+                AccessoriesTotal = accessoriesTotal,
+                AdditionalItemsTotal = additionalItemsTotal,
+                TotalPrice = totalPrice,
+                Width = width,
+                Height = height,
+                Depth = depth,
+                OrderDate = DateTime.UtcNow,
+                GrandTotal = 0
+            });
+        }
+
+        private static string IncrementCheckoutVersion(string? currentVersion, bool hasExistingDetails)
+        {
+            if (!hasExistingDetails)
+                return "Version 1A";
+
+            var match = Regex.Match(currentVersion ?? string.Empty, "^Version (\\d+)([A-Z])$");
+            if (!match.Success)
+                return "Version 1A";
+
+            var number = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+            var letter = match.Groups[2].Value[0];
+            if (letter == 'Z')
+            {
+                number++;
+                letter = 'A';
+            }
+            else
+            {
+                letter++;
+            }
+
+            return $"Version {number}{letter}";
         }
 
         private static ProjectCartItemResponse MapCartItem(
