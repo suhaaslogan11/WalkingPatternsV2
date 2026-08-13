@@ -4,6 +4,7 @@ import ClientForm from "./pages/clients/ClientForm";
 import ProjectList from "./pages/projects/ProjectList";
 import ProjectForm from "./pages/projects/ProjectForm";
 import ProjectDetail from "./pages/projects/ProjectDetail";
+import KitchenPricing from "./pages/projects/KitchenPricing";
 import { ToastContainer } from "react-toastify";
 
 function App() {
@@ -40,6 +41,11 @@ function App() {
             <Route
                 path="/projects/:projectId"
                 element={<ProjectDetail />}
+            />
+
+            <Route
+                path="/projects/:projectId/kitchen"
+                element={<KitchenPricing />}
             />
 
         </Routes>
