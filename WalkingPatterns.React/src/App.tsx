@@ -5,6 +5,9 @@ import ProjectList from "./pages/projects/ProjectList";
 import ProjectForm from "./pages/projects/ProjectForm";
 import ProjectDetail from "./pages/projects/ProjectDetail";
 import KitchenPricing from "./pages/projects/KitchenPricing";
+import BedroomPricing from "./pages/projects/BedroomPricing";
+import OtherWoodworkPricing from "./pages/projects/OtherWoodworkPricing";
+import HdsPricing from "./pages/projects/HdsPricing";
 import { ToastContainer } from "react-toastify";
 
 function App() {
@@ -46,6 +49,21 @@ function App() {
             <Route
                 path="/projects/:projectId/kitchen"
                 element={<KitchenPricing />}
+            />
+
+            <Route
+                path="/projects/:projectId/bedroom"
+                element={<BedroomPricing />}
+            />
+
+            <Route
+                path="/projects/:projectId/other-woodwork"
+                element={<OtherWoodworkPricing />}
+            />
+
+            <Route
+                path="/projects/:projectId/hds"
+                element={<HdsPricing />}
             />
 
         </Routes>

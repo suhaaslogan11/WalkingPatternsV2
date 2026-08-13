@@ -21,6 +21,9 @@ builder.Services.AddScoped<IClientService, ClientService>();
 
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IKitchenPricingService, KitchenPricingService>();
+builder.Services.AddScoped<IBedroomPricingService, BedroomPricingService>();
+builder.Services.AddScoped<IOtherWoodworkPricingService, OtherWoodworkPricingService>();
+builder.Services.AddScoped<IHdsPricingService, HdsPricingService>();
 
 builder.Services.AddScoped<JwtService>();
 

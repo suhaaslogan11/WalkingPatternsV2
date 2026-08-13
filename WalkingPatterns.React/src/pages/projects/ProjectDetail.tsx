@@ -247,7 +247,7 @@ function ProjectDetail() {
 
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="mb-0">Project Details</h2>
-                <div><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/kitchen`)}>Add Kitchen</button><button className="btn btn-secondary" onClick={() => navigate(-1)}>Back to Projects</button></div>
+                <div><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/kitchen`)}>Add Kitchen</button><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/bedroom`)}>Add Bedroom</button><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/other-woodwork`)}>Add Other Woodwork</button><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/hds`)}>Add HDS</button><button className="btn btn-secondary" onClick={() => navigate(-1)}>Back to Projects</button></div>
             </div>
 
             <div className="card shadow mb-4">
