@@ -2,9 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using WalkingPatterns.Api.Data;
 using WalkingPatterns.Api.Interfaces;
 using WalkingPatterns.Api.Services;
+using QuestPDF.Infrastructure;
 
 
 var builder = WebApplication.CreateBuilder(args);
+QuestPDF.Settings.License = LicenseType.Community;
 
 // Add services
 builder.Services.AddControllers();

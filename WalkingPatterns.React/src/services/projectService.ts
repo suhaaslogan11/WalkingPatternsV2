@@ -81,6 +81,11 @@ const checkoutProject = async (projectId: number): Promise<ProjectCheckoutRespon
     return response.data;
 };
 
+const downloadQuotation = async (projectId: number): Promise<Blob> => {
+    const response = await api.get(`/projects/${projectId}/quotation`, { responseType: "blob" });
+    return response.data;
+};
+
 const addProject = async (
     clientId: number,
     project: AddProjectRequest
@@ -114,6 +119,7 @@ export default {
     getProjectCart,
     deleteProjectCartItem,
     checkoutProject,
+    downloadQuotation,
     addProject,
     deleteProject,
     updateProject
