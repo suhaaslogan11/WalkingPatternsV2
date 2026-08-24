@@ -117,11 +117,11 @@ function ProjectList() {
 
     return (
 
-        <div className="container mt-5">
+        <div className="container py-4 py-md-5">
 
             <div className="d-flex justify-content-between align-items-center mb-4">
 
-                <h2 className="mb-0">Projects</h2>
+                <div><h2 className="page-title mb-1">Projects</h2><div className="text-muted small">Projects for the selected client</div></div>
 
                 <Link to="/" className="btn btn-secondary">
                     Back to Clients
@@ -195,7 +195,7 @@ function ProjectList() {
 
                 <div className="card-body">
 
-                    <table className="table table-striped table-hover table-bordered mb-0">
+                    <div className="table-responsive"><table className="table table-striped table-hover table-bordered mb-0">
 
                         <thead className="table-dark">
                             <tr>
@@ -209,7 +209,7 @@ function ProjectList() {
                         <tbody>
                             {projects.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="text-center">
+                                    <td colSpan={4} className="empty-state">
                                         No Projects Found
                                     </td>
                                 </tr>
@@ -246,7 +246,7 @@ function ProjectList() {
                             )}
                         </tbody>
 
-                    </table>
+                    </table></div>
 
                 </div>
 

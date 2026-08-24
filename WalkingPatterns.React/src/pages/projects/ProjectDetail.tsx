@@ -260,20 +260,20 @@ function ProjectDetail() {
 
     return (
 
-        <div className="container mt-5">
+        <div className="container py-4 py-md-5">
 
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="mb-0">Project Details</h2>
+                <h2 className="page-title mb-0">Project Details</h2>
                 <div><button className="btn btn-outline-dark me-2" onClick={() => void handleDownloadQuotation()}>Generate Quotation</button><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/kitchen`)}>Add Kitchen</button><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/bedroom`)}>Add Bedroom</button><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/other-woodwork`)}>Add Other Woodwork</button><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/hds`)}>Add HDS</button><button className="btn btn-secondary" onClick={() => navigate(-1)}>Back to Projects</button></div>
             </div>
 
             <div className="card shadow mb-4">
                 <div className="card-body">
                     <div className="row">
-                        <div className="col-md-3"><strong>Client:</strong> {details.clientName}</div>
-                        <div className="col-md-3"><strong>Project:</strong> {details.projectName}</div>
-                        <div className="col-md-3"><strong>Date:</strong> {details.projectDate}</div>
-                        <div className="col-md-3"><strong>Version:</strong> {details.versionNumber}</div>
+                        <div className="col-md-3"><span className="text-muted small d-block">Client</span><strong>{details.clientName}</strong></div>
+                        <div className="col-md-3"><span className="text-muted small d-block">Project</span><strong>{details.projectName}</strong></div>
+                        <div className="col-md-3"><span className="text-muted small d-block">Date</span><strong>{details.projectDate}</strong></div>
+                        <div className="col-md-3"><span className="text-muted small d-block">Version</span><strong>{details.versionNumber}</strong></div>
                     </div>
                 </div>
             </div>
@@ -284,9 +284,9 @@ function ProjectDetail() {
                 </div>
                 <div className="card-body">
                     <div className="row mb-3">
-                        <div className="col-md-4"><strong>Grand Total:</strong> ₹{financials.grandTotal.toFixed(2)}</div>
-                        <div className="col-md-4"><strong>Discount:</strong> ₹{financials.discountAmount.toFixed(2)}</div>
-                        <div className="col-md-4"><strong>Discounted Total:</strong> ₹{financials.discountedTotal.toFixed(2)}</div>
+                        <div className="col-md-4"><span className="text-muted small d-block">Grand Total</span><span className="summary-value">₹{financials.grandTotal.toFixed(2)}</span></div>
+                        <div className="col-md-4"><span className="text-muted small d-block">Discount</span><span className="summary-value">₹{financials.discountAmount.toFixed(2)}</span></div>
+                        <div className="col-md-4"><span className="text-muted small d-block">Discounted Total</span><span className="summary-value prominent">₹{financials.discountedTotal.toFixed(2)}</span></div>
                     </div>
                     <form onSubmit={handleSubmit(onApplyDiscount)} noValidate>
                         <div className="row g-3 align-items-end">
@@ -348,7 +348,7 @@ function ProjectDetail() {
                         <p className="mb-0">No cart items found.</p>
                     ) : (
                         <div className="table-responsive">
-                            <table className="table table-striped table-bordered mb-0">
+                            <table className="table table-striped table-hover table-bordered mb-0">
                                 <thead className="table-light">
                                     <tr>
                                         <th>Source</th>
@@ -398,7 +398,7 @@ function ProjectDetail() {
                     <h4 className="mb-0">Modules</h4>
                 </div>
                 <div className="card-body">
-                    <table className="table table-striped table-hover table-bordered mb-0">
+                    <div className="table-responsive"><table className="table table-striped table-hover table-bordered mb-0">
                         <thead className="table-dark">
                             <tr>
                                 <th>Room Name</th>
@@ -412,7 +412,7 @@ function ProjectDetail() {
                         <tbody>
                             {details.modules.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="text-center">
+                                    <td colSpan={6} className="empty-state">
                                         No Modules Found
                                     </td>
                                 </tr>
@@ -477,7 +477,7 @@ function ProjectDetail() {
                                 ))
                             )}
                         </tbody>
-                    </table>
+                    </table></div>
                 </div>
             </div>
 

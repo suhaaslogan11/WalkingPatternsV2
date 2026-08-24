@@ -81,15 +81,15 @@ function ClientForm() {
 
     return (
 
-        <div className="container mt-5">
+        <div className="container py-3">
 
-            <h2 className="mb-4">
+            <h2 className="page-title mb-4">
 
                 {id ? "Edit Client" : "Add Client"}
 
             </h2>
 
-            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <form className="border rounded p-3 bg-white mx-auto" style={{ maxWidth: 680 }} onSubmit={handleSubmit(onSubmit)} noValidate>
 
                 <div className="mb-3">
 
@@ -171,20 +171,20 @@ function ClientForm() {
 
                 </div>
 
-                <button
+                <div className="client-form-actions"><button
                     type="submit"
-                    className="btn btn-success"
+                    className="btn btn-primary"
                 >
                     {id ? "Update" : "Save"}
                 </button>
 
                 <button
                     type="button"
-                    className="btn btn-secondary ms-2"
+                    className="btn btn-outline-secondary ms-2 px-4"
                     onClick={() => navigate("/")}
                 >
                     Cancel
-                </button>
+                </button></div>
 
             </form>
 

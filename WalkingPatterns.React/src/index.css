@@ -1,12 +1,12 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
+  --text: #5f6b66;
+  --text-h: #1f2b27;
+  --bg: #f5f7f6;
+  --border: #dfe6e2;
   --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
+  --accent: #2563b8;
+  --accent-bg: rgba(37, 99, 184, 0.1);
+  --accent-border: rgba(37, 99, 184, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
@@ -17,7 +17,7 @@
 
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: light dark;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -30,28 +30,7 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
 #root {
-  width: 1126px;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
@@ -64,7 +43,40 @@
 
 body {
   margin: 0;
+  background: var(--bg);
 }
+
+.app-header { width: 100vw; margin-left: calc(50% - 50vw); background: #d9eaf5; color: #17324d; border-bottom: 1px solid #b7cfdf; box-shadow: 0 1px 4px rgba(31, 61, 82, .1); }
+.app-header-inner { max-width: 1126px; margin: 0 auto; min-height: 48px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; }
+.brand-mark { color: #17324d; text-decoration: none; display: flex; flex-direction: column; line-height: 1.1; }
+.brand-name { font-weight: 700; font-size: 1rem; letter-spacing: .1px; }
+.brand-subtitle { display: none; }
+.header-logout { color: #244763; border: 1px solid #8fb0c4; text-decoration: none; font-size: .8rem; padding: 4px 12px; border-radius: 4px; }
+.header-logout:hover { background: #fff; color: #17324d; }
+.container { max-width: 1126px; }
+.card { border: 1px solid var(--border); border-radius: 4px; box-shadow: 0 2px 6px rgba(34, 55, 45, .04) !important; overflow: hidden; }
+.card-header { background: #fff; border-bottom: 1px solid var(--border); padding: .7rem .9rem; }
+.card-body { background: #fff; padding: .9rem; }
+.table { vertical-align: middle; }
+.table thead th { white-space: nowrap; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+.table-dark { --bs-table-bg: #e8f1f7; --bs-table-color: #17324d; --bs-table-border-color: #b7cfdf; }
+.btn { border-radius: 4px; font-weight: 600; }
+.btn-primary { background-color: #2563b8; border-color: #2563b8; }
+.btn-primary:hover { background-color: #1d4f91; border-color: #1d4f91; }
+.btn-success { background-color: #2f7d5b; border-color: #2f7d5b; }
+.btn-success:hover { background-color: #256548; border-color: #256548; }
+.form-control, .form-select { border-color: #cfdad4; border-radius: 4px; padding: .5rem .65rem; }
+.form-control:focus, .form-select:focus { border-color: #6f9fbe; box-shadow: 0 0 0 .2rem rgba(37,99,184,.14); }
+.form-label { color: var(--text-h); font-size: .88rem; font-weight: 600; margin-bottom: .4rem; }
+.client-form-actions { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+.client-form-actions .btn { width: 100%; }
+.text-danger { font-size: .8rem; margin-top: .35rem; }
+.page-title { color: var(--text-h); font-weight: 700; }
+.empty-state { color: #7b8781; padding: 1.25rem 1rem !important; text-align: center; }
+.summary-value { font-size: 1.35rem; font-weight: 700; color: #294a3b; }
+.summary-value.prominent { color: #2f7d5b; font-size: 1.6rem; }
+.modal-content { border: 0; border-radius: 12px; box-shadow: 0 18px 50px rgba(0,0,0,.18); }
+@media (max-width: 768px) { .app-header-inner { padding: 0 16px; } .container { padding-left: 16px; padding-right: 16px; } .table-responsive { border-radius: 8px; } .page-title { font-size: 1.45rem; } }
 
 h1,
 h2 {

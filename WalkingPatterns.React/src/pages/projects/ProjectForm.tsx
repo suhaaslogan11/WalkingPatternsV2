@@ -85,11 +85,11 @@ function ProjectForm() {
 
     return (
 
-        <div className="container mt-5">
+        <div className="container py-4 py-md-5">
 
-            <h2 className="mb-4">Edit Project</h2>
+            <h2 className="page-title mb-4">Edit Project</h2>
 
-            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <form className="card shadow-sm mx-auto p-3 p-md-4" style={{ maxWidth: 640 }} onSubmit={handleSubmit(onSubmit)} noValidate>
 
                 <div className="mb-3">
                     <label className="form-label">Project Name</label>

@@ -8,12 +8,14 @@ import KitchenPricing from "./pages/projects/KitchenPricing";
 import BedroomPricing from "./pages/projects/BedroomPricing";
 import OtherWoodworkPricing from "./pages/projects/OtherWoodworkPricing";
 import HdsPricing from "./pages/projects/HdsPricing";
+import AppHeader from "./components/AppHeader";
 import { ToastContainer } from "react-toastify";
 
 function App() {
 
     return (
     <>
+        <AppHeader />
         <Routes>
 
             <Route

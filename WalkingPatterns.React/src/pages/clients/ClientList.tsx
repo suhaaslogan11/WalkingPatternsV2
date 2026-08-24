@@ -65,15 +65,13 @@ function ClientList() {
 
     return (
 
-        <div className="container mt-5">
+        <div className="container py-3">
 
-            <div className="card shadow">
+            <div>
 
-                <div className="card-header d-flex justify-content-between align-items-center">
+                <div className="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
 
-                    <h3 className="mb-0">
-                        Clients
-                    </h3>
+                    <div><div className="page-title h3 mb-1">Clients</div><div className="text-muted small">Manage your clients and project workspaces</div></div>
 
                     <Link
                         to="/clients/add"
@@ -85,9 +83,9 @@ function ClientList() {
 
                 </div>
 
-                <div className="card-body">
+                <div>
 
-                    <table className="table table-striped table-hover table-bordered">
+                    <div className="table-responsive"><table className="table table-striped table-hover table-bordered mb-0">
 
                         <thead className="table-dark">
 
@@ -113,7 +111,7 @@ function ClientList() {
 
                                     <td
                                         colSpan={5}
-                                        className="text-center">
+                                        className="empty-state">
 
                                         No Clients Found
 
@@ -136,7 +134,7 @@ function ClientList() {
 
                                             <Link
                                                 to={`/clients/edit/${client.clientId}`}
-                                                className="btn btn-warning btn-sm me-2">
+                                                className="btn btn-outline-primary btn-sm me-2">
 
                                                 Edit
 
@@ -144,7 +142,7 @@ function ClientList() {
 
                                             <Link
                                                 to={`/clients/${client.clientId}/projects`}
-                                                className="btn btn-info btn-sm me-2">
+                                                className="btn btn-primary btn-sm me-2">
 
                                                 Projects
 
@@ -165,7 +163,7 @@ function ClientList() {
 
                         </tbody>
 
-                    </table>
+                    </table></div>
 
                 </div>
 
