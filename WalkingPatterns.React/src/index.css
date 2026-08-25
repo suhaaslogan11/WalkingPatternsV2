@@ -64,6 +64,14 @@ body {
 .module-rename-actions { display: flex; align-items: center; justify-content: center; flex-wrap: nowrap; gap: 8px; }
 .module-rename-actions .form-control { flex: 0 0 160px; width: 160px; padding: .35rem .6rem; }
 .module-rename-actions .btn { margin: 0; padding: .35rem .6rem; border-radius: 4px; white-space: nowrap; }
+.pricing-page-header { position: relative; display: flex; align-items: center; justify-content: center; min-height: 38px; border-bottom: 1px solid var(--border); padding-bottom: .65rem; margin-bottom: 1rem; }
+.pricing-page-header .page-title { margin: 0; text-align: center; }
+.pricing-page-actions { position: absolute; right: 0; display: flex; align-items: center; gap: 8px; }
+.pricing-form .card { overflow: visible; }
+.pricing-accessory-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 38px; padding: .2rem 0; }
+.pricing-accessory-quantity { flex: 0 0 150px; }
+.pricing-additional-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(120px, 1fr) minmax(120px, 1fr) auto; align-items: center; gap: 8px; margin-bottom: 8px; }
+.pricing-submit { text-align: center; margin-top: .25rem; }
 .card-header { background: #fff; border-bottom: 1px solid var(--border); padding: .7rem .9rem; }
 .card-body { background: #fff; padding: .9rem; }
 .table { vertical-align: middle; }
@@ -88,7 +96,7 @@ body {
 .summary-value { font-size: 1.35rem; font-weight: 700; color: #294a3b; }
 .summary-value.prominent { color: #2f7d5b; font-size: 1.6rem; }
 .modal-content { border: 0; border-radius: 12px; box-shadow: 0 18px 50px rgba(0,0,0,.18); }
-@media (max-width: 768px) { .app-header-inner { padding: 0 16px; } .container { padding-left: 16px; padding-right: 16px; } .container form { width: 100%; } .table-responsive { border-radius: 8px; } .page-title { font-size: 1.45rem; } .module-actions, .module-rename-actions { justify-content: flex-start; } }
+@media (max-width: 768px) { .app-header-inner { padding: 0 16px; } .container { padding-left: 16px; padding-right: 16px; } .container form { width: 100%; } .table-responsive { border-radius: 8px; } .page-title { font-size: 1.45rem; } .module-actions, .module-rename-actions { justify-content: flex-start; } .pricing-page-header { flex-direction: column; gap: .5rem; } .pricing-page-actions { position: static; justify-content: center; } .pricing-additional-row { grid-template-columns: 1fr 1fr; } .pricing-additional-name { grid-column: 1 / -1; } .pricing-additional-row > .btn { justify-self: start; } }
 @media (min-width: 1200px) { .container { padding-left: 24px; padding-right: 24px; } }
 
 h1,

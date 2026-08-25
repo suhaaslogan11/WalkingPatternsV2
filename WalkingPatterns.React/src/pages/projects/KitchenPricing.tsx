@@ -6,6 +6,7 @@ import kitchenService, {
     type KitchenItemRequest,
     type KitchenPricing
 } from "../../services/kitchenService";
+import ProjectCart from "../../components/ProjectCart";
 
 type FormValues = KitchenItemRequest;
 
@@ -14,6 +15,7 @@ function KitchenPricingPage() {
     const { projectId } = useParams();
     const parsedProjectId = Number(projectId);
     const [pricing, setPricing] = useState<KitchenPricing>();
+    const [cartRefreshKey, setCartRefreshKey] = useState(0);
     const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<FormValues>({
         defaultValues: {
             parent: "", utilityName: "", width: "", height: "", depth: "", materials: "",
@@ -57,6 +59,7 @@ function KitchenPricingPage() {
                 quantities: data.quantities || []
             });
             toast.success(`Kitchen item saved. Total: ₹${result.totalPrice.toFixed(2)}`);
+            setCartRefreshKey((key) => key + 1);
         } catch (error) {
             console.error(error);
             const responseError = error as { response?: { data?: { message?: string } } };
@@ -68,13 +71,16 @@ function KitchenPricingPage() {
         return <div className="container mt-5"><div className="alert alert-danger">Invalid project.</div></div>;
 
     return (
-        <div className="container mt-5">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Kitchen Pricing</h2>
-                <button className="btn btn-secondary" onClick={() => navigate(`/projects/${parsedProjectId}`)}>Back to Project</button>
+        <div className="container py-3">
+            <div className="pricing-page-header">
+                <h2 className="page-title mb-0">Kitchen Pricing</h2>
+                <div className="pricing-page-actions">
+                    <button className="btn btn-secondary btn-sm" onClick={() => navigate(`/projects/${parsedProjectId}`)}>Back to Project</button>
+                    <ProjectCart projectId={parsedProjectId} refreshKey={cartRefreshKey} sourceFilter="Kitchen" />
+                </div>
             </div>
-            <form onSubmit={handleSubmit(onSubmit)} noValidate>
-                <div className="card shadow mb-4"><div className="card-body">
+            <form className="pricing-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+                <div className="card shadow-sm mb-3"><div className="card-body">
                     <div className="row g-3">
                         <div className="col-md-6"><label className="form-label">Parent / Unit Type</label>
                             <select className="form-select" {...register("parent", { required: "Parent is required" })} onChange={(e) => onParentChange(e.target.value)}>
@@ -86,9 +92,9 @@ function KitchenPricingPage() {
                         <div className="col-md-6"><label className="form-label">Shutter Material</label><select className="form-select" {...register("materials", { required: "Material is required" })}><option value="">Select material</option>{Object.keys(pricing?.materials || {}).map((material) => <option key={material} value={material}>{material}</option>)}</select>{errors.materials && <div className="text-danger">{errors.materials.message}</div>}</div>
                     </div>
                 </div></div>
-                <div className="card shadow mb-4"><div className="card-header">Accessories</div><div className="card-body">{accessoryOptions.length === 0 ? <p className="mb-0">Select a parent to view accessories.</p> : accessoryOptions.map((option) => { const checked = selectedAccessories.includes(option.name); const selectedIndex = selectedAccessories.indexOf(option.name); return <div className="row align-items-center mb-2" key={option.name}><div className="col-md-7"><label><input type="checkbox" className="form-check-input me-2" checked={checked} onChange={(e) => { const next = e.target.checked ? [...selectedAccessories, option.name] : selectedAccessories.filter((name) => name !== option.name); const quantities = e.target.checked ? [...selectedQuantities, "1"] : selectedQuantities.filter((_, index) => index !== selectedIndex); setValue("accessories", next); setValue("quantities", quantities); }} />{option.name}</label></div>{checked && <div className="col-md-3"><input type="number" min="1" step="1" className="form-control" {...register(`quantities.${selectedIndex}`, { required: true, min: 1, pattern: /^\d+$/ })} placeholder="Quantity" /></div>}{errors.quantities?.[selectedIndex] && <div className="text-danger">Quantity must be a positive integer.</div>}</div>; })}</div></div>
-                <div className="card shadow mb-4"><div className="card-header d-flex justify-content-between"><span>Additional Items</span><button type="button" className="btn btn-outline-primary btn-sm" onClick={() => append({ name: "", amount: 0, quantity: 1 })}>Add Item</button></div><div className="card-body">{fields.map((field, index) => <div className="row g-2 mb-2" key={field.id}><div className="col-md-5"><input className="form-control" placeholder="Name" {...register(`additionalItems.${index}.name`)} /></div><div className="col-md-3"><input type="number" min="0" step="any" className="form-control" placeholder="Amount" {...register(`additionalItems.${index}.amount`, { valueAsNumber: true, min: 0 })} /></div><div className="col-md-3"><input type="number" min="1" step="1" className="form-control" placeholder="Quantity" {...register(`additionalItems.${index}.quantity`, { valueAsNumber: true, min: 1, required: true })} /></div><div className="col-md-1"><button type="button" className="btn btn-outline-danger" onClick={() => remove(index)}>×</button></div></div>)}</div></div>
-                <button type="submit" className="btn btn-primary">Calculate & Save Kitchen Item</button>
+                <div className="card shadow-sm mb-3"><div className="card-header">Accessories</div><div className="card-body">{accessoryOptions.length === 0 ? <p className="mb-0 text-center text-muted">Select a parent to view accessories.</p> : accessoryOptions.map((option) => { const checked = selectedAccessories.includes(option.name); const selectedIndex = selectedAccessories.indexOf(option.name); return <div className="pricing-accessory-row" key={option.name}><label><input type="checkbox" className="form-check-input me-2" checked={checked} onChange={(e) => { const next = e.target.checked ? [...selectedAccessories, option.name] : selectedAccessories.filter((name) => name !== option.name); const quantities = e.target.checked ? [...selectedQuantities, "1"] : selectedQuantities.filter((_, index) => index !== selectedIndex); setValue("accessories", next); setValue("quantities", quantities); }} />{option.name}</label>{checked && <div className="pricing-accessory-quantity"><input type="number" min="1" step="1" className="form-control" {...register(`quantities.${selectedIndex}`, { required: true, min: 1, pattern: /^\d+$/ })} placeholder="Quantity" /></div>}{errors.quantities?.[selectedIndex] && <div className="text-danger">Quantity must be a positive integer.</div>}</div>; })}</div></div>
+                <div className="card shadow-sm mb-3"><div className="card-header d-flex justify-content-between align-items-center"><span>Additional Items</span><button type="button" className="btn btn-outline-primary btn-sm" onClick={() => append({ name: "", amount: 0, quantity: 1 })}>Add Item</button></div><div className="card-body">{fields.map((field, index) => <div className="pricing-additional-row" key={field.id}><div className="pricing-additional-name"><input className="form-control" placeholder="Name" {...register(`additionalItems.${index}.name`)} /></div><div className="pricing-additional-amount"><input type="number" min="0" step="any" className="form-control" placeholder="Amount" {...register(`additionalItems.${index}.amount`, { valueAsNumber: true, min: 0 })} /></div><div className="pricing-additional-quantity"><input type="number" min="1" step="1" className="form-control" placeholder="Quantity" {...register(`additionalItems.${index}.quantity`, { valueAsNumber: true, min: 1, required: true })} /></div><button type="button" className="btn btn-outline-danger btn-sm" onClick={() => remove(index)}>Remove</button></div>)}</div></div>
+                <div className="pricing-submit"><button type="submit" className="btn btn-primary">Calculate & Save Kitchen Item</button></div>
             </form>
         </div>
     );
