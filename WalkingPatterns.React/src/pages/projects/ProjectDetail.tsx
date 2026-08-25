@@ -24,6 +24,9 @@ function ProjectDetail() {
     const [financials, setFinancials] = useState<ProjectFinancials>();
     const [orders, setOrders] = useState<ProjectOrders | null>(null);
     const [cartItems, setCartItems] = useState<ProjectCartItem[]>([]);
+    const [cartOpen, setCartOpen] = useState(false);
+    const [moduleMenuOpen, setModuleMenuOpen] = useState(false);
+    const [priceSummaryOpen, setPriceSummaryOpen] = useState(false);
     const [checkoutResult, setCheckoutResult] = useState<ProjectCheckoutResponse | null>(null);
     const [renamingModuleId, setRenamingModuleId] = useState<number | null>(null);
     const [newRoomName, setNewRoomName] = useState("");
@@ -260,29 +263,69 @@ function ProjectDetail() {
 
     return (
 
-        <div className="container py-4 py-md-5">
+        <div className="container py-3">
 
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="page-title mb-0">Project Details</h2>
-                <div><button className="btn btn-outline-dark me-2" onClick={() => void handleDownloadQuotation()}>Generate Quotation</button><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/kitchen`)}>Add Kitchen</button><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/bedroom`)}>Add Bedroom</button><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/other-woodwork`)}>Add Other Woodwork</button><button className="btn btn-success me-2" onClick={() => navigate(`/projects/${parsedProjectId}/hds`)}>Add HDS</button><button className="btn btn-secondary" onClick={() => navigate(-1)}>Back to Projects</button></div>
+            <div className="text-end small mb-2">
+                <div><strong>Client Name :</strong> {details.clientName}</div>
+                <div><strong>Project Date :</strong> {details.projectDate}</div>
+                <div><strong>Project Version :</strong> {details.versionNumber}</div>
             </div>
 
-            <div className="card shadow mb-4">
-                <div className="card-body">
-                    <div className="row">
-                        <div className="col-md-3"><span className="text-muted small d-block">Client</span><strong>{details.clientName}</strong></div>
-                        <div className="col-md-3"><span className="text-muted small d-block">Project</span><strong>{details.projectName}</strong></div>
-                        <div className="col-md-3"><span className="text-muted small d-block">Date</span><strong>{details.projectDate}</strong></div>
-                        <div className="col-md-3"><span className="text-muted small d-block">Version</span><strong>{details.versionNumber}</strong></div>
+            <div className="card shadow-sm project-actions-card mb-3">
+                <div className="card-header text-center">
+                    <h4 className="mb-0">Project Details</h4>
+                </div>
+                <div className="card-body py-2">
+                    <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div className="d-flex align-items-center gap-2">
+                            <div className="dropdown">
+                                <button
+                                    type="button"
+                                    className="btn btn-primary btn-sm dropdown-toggle"
+                                    aria-expanded={moduleMenuOpen}
+                                    onClick={() => setModuleMenuOpen((open) => !open)}
+                                >
+                                    Add New Module
+                                </button>
+                                {moduleMenuOpen && (
+                                    <div className="dropdown-menu show">
+                                        <button className="dropdown-item" onClick={() => { setModuleMenuOpen(false); navigate(`/projects/${parsedProjectId}/kitchen`); }}>Kitchen</button>
+                                        <button className="dropdown-item" onClick={() => { setModuleMenuOpen(false); navigate(`/projects/${parsedProjectId}/bedroom`); }}>Bedroom</button>
+                                        <button className="dropdown-item" onClick={() => { setModuleMenuOpen(false); navigate(`/projects/${parsedProjectId}/other-woodwork`); }}>Other Woodwork</button>
+                                        <button className="dropdown-item" onClick={() => { setModuleMenuOpen(false); navigate(`/projects/${parsedProjectId}/hds`); }}>HDS</button>
+                                    </div>
+                                )}
+                            </div>
+                            <button className="btn btn-secondary btn-sm" onClick={() => navigate(-1)}>Back to Projects</button>
+                        </div>
+                        <div className="d-flex justify-content-end flex-wrap gap-2">
+                            <button className="btn btn-outline-secondary btn-sm" onClick={() => void handleDownloadQuotation()}>Generate Quotation</button>
+                            <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => setCartOpen(true)}>
+                                Cart <span className="badge text-bg-primary ms-1">{cartItems.length}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="card shadow mb-4">
-                <div className="card-header">
-                    <h4 className="mb-0">Price Summary</h4>
+            <div className="card shadow-sm mb-3">
+                <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <button
+                        type="button"
+                        className="btn btn-link p-0 text-decoration-none page-title"
+                        aria-expanded={priceSummaryOpen}
+                        onClick={() => setPriceSummaryOpen((open) => !open)}
+                    >
+                        Price Summary <span className="small">{priceSummaryOpen ? "▲" : "▼"}</span>
+                    </button>
+                    {!priceSummaryOpen && (
+                        <div className="small text-muted">
+                            Grand Total: <strong>₹{financials.grandTotal.toFixed(2)}</strong><span className="mx-2">|</span>
+                            Discounted Total: <strong>₹{financials.discountedTotal.toFixed(2)}</strong>
+                        </div>
+                    )}
                 </div>
-                <div className="card-body">
+                {priceSummaryOpen && <div className="card-body">
                     <div className="row mb-3">
                         <div className="col-md-4"><span className="text-muted small d-block">Grand Total</span><span className="summary-value">₹{financials.grandTotal.toFixed(2)}</span></div>
                         <div className="col-md-4"><span className="text-muted small d-block">Discount</span><span className="summary-value">₹{financials.discountAmount.toFixed(2)}</span></div>
@@ -319,79 +362,86 @@ function ProjectDetail() {
                             </div>
                         </div>
                     </form>
-                </div>
+                </div>}
             </div>
 
-            <div className="card shadow mb-4">
-                <div className="card-header d-flex justify-content-between align-items-center">
-                    <h4 className="mb-0">Cart</h4>
-                    <div>
-                        <button
-                            type="button"
-                            className="btn btn-outline-primary btn-sm me-2"
-                            onClick={() => void projectService.getProjectCart(parsedProjectId).then(setCartItems)}
-                        >
-                            Refresh
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-success btn-sm"
-                            disabled={cartItems.length === 0}
-                            onClick={() => void handleCheckout()}
-                        >
-                            Checkout
-                        </button>
+            {cartOpen && <div className="modal fade show d-block" tabIndex={-1} role="dialog">
+                <div className="modal-dialog modal-xl modal-dialog-centered" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">Cart ({cartItems.length})</h5>
+                            <button type="button" className="btn-close" aria-label="Close" onClick={() => setCartOpen(false)} />
+                        </div>
+                        <div className="modal-body">
+                            <div className="d-flex justify-content-end gap-2 mb-3">
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-primary btn-sm"
+                                    onClick={() => void projectService.getProjectCart(parsedProjectId).then(setCartItems)}
+                                >
+                                    Refresh
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-success btn-sm"
+                                    disabled={cartItems.length === 0}
+                                    onClick={() => void handleCheckout()}
+                                >
+                                    Checkout
+                                </button>
+                            </div>
+                            {cartItems.length === 0 ? (
+                                <p className="mb-0">No cart items found.</p>
+                            ) : (
+                                <div className="table-responsive">
+                                    <table className="table table-striped table-hover table-bordered mb-0">
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>Source</th>
+                                                <th>Room/Utility</th>
+                                                <th>Material</th>
+                                                <th>Dimensions</th>
+                                                <th>Total</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {cartItems.map((item) => (
+                                                <tr key={`${item.source}-${item.id}`}>
+                                                    <td>{item.source}</td>
+                                                    <td>{item.utilityName || item.utilityNameOld || "N/A"}</td>
+                                                    <td>{item.materials || "N/A"}</td>
+                                                    <td>{item.width || "N/A"} x {item.height || "N/A"} x {item.depth || "N/A"}</td>
+                                                    <td>₹{item.totalPrice.toFixed(2)}</td>
+                                                    <td>
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-danger btn-sm"
+                                                            onClick={() => void handleDeleteCartItem(item)}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                            {checkoutResult && (
+                                <div className="alert alert-success mt-3 mb-0">
+                                    <strong>Checkout complete:</strong>{" "}
+                                    {checkoutResult.checkedOutItemCount} item(s), cart total ₹{checkoutResult.cartTotal.toFixed(2)},{" "}
+                                    grand total ₹{checkoutResult.grandTotal.toFixed(2)}, discount ₹{checkoutResult.discountAmount.toFixed(2)},{" "}
+                                    discounted total ₹{checkoutResult.discountedTotal.toFixed(2)}, version {checkoutResult.versionNumber}.
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
-                <div className="card-body">
-                    {cartItems.length === 0 ? (
-                        <p className="mb-0">No cart items found.</p>
-                    ) : (
-                        <div className="table-responsive">
-                            <table className="table table-striped table-hover table-bordered mb-0">
-                                <thead className="table-light">
-                                    <tr>
-                                        <th>Source</th>
-                                        <th>Room/Utility</th>
-                                        <th>Material</th>
-                                        <th>Dimensions</th>
-                                        <th>Total</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {cartItems.map((item) => (
-                                        <tr key={`${item.source}-${item.id}`}>
-                                            <td>{item.source}</td>
-                                            <td>{item.utilityName || item.utilityNameOld || "N/A"}</td>
-                                            <td>{item.materials || "N/A"}</td>
-                                            <td>{item.width || "N/A"} x {item.height || "N/A"} x {item.depth || "N/A"}</td>
-                                            <td>₹{item.totalPrice.toFixed(2)}</td>
-                                            <td>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-danger btn-sm"
-                                                    onClick={() => void handleDeleteCartItem(item)}
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                    {checkoutResult && (
-                        <div className="alert alert-success mt-3 mb-0">
-                            <strong>Checkout complete:</strong>{" "}
-                            {checkoutResult.checkedOutItemCount} item(s), cart total ₹{checkoutResult.cartTotal.toFixed(2)},{" "}
-                            grand total ₹{checkoutResult.grandTotal.toFixed(2)}, discount ₹{checkoutResult.discountAmount.toFixed(2)},{" "}
-                            discounted total ₹{checkoutResult.discountedTotal.toFixed(2)}, version {checkoutResult.versionNumber}.
-                        </div>
-                    )}
-                </div>
-            </div>
+            </div>}
+
+            {cartOpen && <div className="modal-backdrop fade show" />}
 
             <div className="card shadow">
                 <div className="card-header">
@@ -406,7 +456,7 @@ function ProjectDetail() {
                                 <th>Accessories</th>
                                 <th>Miscellaneous Items</th>
                                 <th>Total</th>
-                                <th>Orders</th>
+                                <th style={{ width: "300px" }}>Orders</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -426,21 +476,21 @@ function ProjectDetail() {
                                         <td>{module.total.toFixed(2)}</td>
                                         <td>
                                             {renamingModuleId === module.projectDetailId ? (
-                                                <div className="input-group input-group-sm mb-2">
+                                                <div className="module-rename-actions">
                                                     <input
-                                                        className="form-control"
+                                                        className="form-control form-control-sm"
                                                         value={newRoomName}
                                                         onChange={(event) => setNewRoomName(event.target.value)}
                                                         placeholder="New room name"
                                                     />
                                                     <button
-                                                        className="btn btn-success"
+                                                        className="btn btn-primary btn-sm"
                                                         onClick={() => void handleRenameModule(module.projectDetailId)}
                                                     >
                                                         Save
                                                     </button>
                                                     <button
-                                                        className="btn btn-secondary"
+                                                        className="btn btn-outline-secondary btn-sm"
                                                         onClick={() => {
                                                             setRenamingModuleId(null);
                                                             setNewRoomName("");
@@ -450,28 +500,30 @@ function ProjectDetail() {
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <button
-                                                    className="btn btn-outline-secondary btn-sm"
-                                                    onClick={() => {
-                                                        setRenamingModuleId(module.projectDetailId);
-                                                        setNewRoomName(module.roomName);
-                                                    }}
-                                                >
-                                                    Rename
-                                                </button>
+                                                <div className="module-actions">
+                                                    <button
+                                                        className="btn btn-outline-secondary btn-sm"
+                                                        onClick={() => {
+                                                            setRenamingModuleId(module.projectDetailId);
+                                                            setNewRoomName(module.roomName);
+                                                        }}
+                                                    >
+                                                        Rename
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-primary btn-sm"
+                                                        onClick={() => handleViewOrders(module.projectDetailId)}
+                                                    >
+                                                        View Orders
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-danger btn-sm"
+                                                        onClick={() => handleDeleteModule(module.projectDetailId, module.roomName)}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
                                             )}
-                                            <button
-                                                className="btn btn-primary btn-sm"
-                                                onClick={() => handleViewOrders(module.projectDetailId)}
-                                            >
-                                                View Orders
-                                            </button>
-                                            <button
-                                                className="btn btn-danger btn-sm ms-2"
-                                                onClick={() => handleDeleteModule(module.projectDetailId, module.roomName)}
-                                            >
-                                                Delete
-                                            </button>
                                         </td>
                                     </tr>
                                 ))

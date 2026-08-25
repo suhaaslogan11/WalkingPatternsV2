@@ -47,17 +47,27 @@ body {
 }
 
 .app-header { width: 100vw; margin-left: calc(50% - 50vw); background: #d9eaf5; color: #17324d; border-bottom: 1px solid #b7cfdf; box-shadow: 0 1px 4px rgba(31, 61, 82, .1); }
-.app-header-inner { max-width: 1126px; margin: 0 auto; min-height: 48px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; }
+.app-header-inner { width: 100%; max-width: none; margin: 0; min-height: 48px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
 .brand-mark { color: #17324d; text-decoration: none; display: flex; flex-direction: column; line-height: 1.1; }
 .brand-name { font-weight: 700; font-size: 1rem; letter-spacing: .1px; }
 .brand-subtitle { display: none; }
 .header-logout { color: #244763; border: 1px solid #8fb0c4; text-decoration: none; font-size: .8rem; padding: 4px 12px; border-radius: 4px; }
 .header-logout:hover { background: #fff; color: #17324d; }
-.container { max-width: 1126px; }
+.container { width: 100%; max-width: 1480px; padding-left: 24px; padding-right: 24px; }
 .card { border: 1px solid var(--border); border-radius: 4px; box-shadow: 0 2px 6px rgba(34, 55, 45, .04) !important; overflow: hidden; }
+.project-actions-card { overflow: visible; position: relative; z-index: 2; }
+.project-actions-card .dropdown-menu { min-width: 100%; margin-top: .25rem; padding: .25rem 0; border: 1px solid #b7cfdf; border-radius: 4px; box-shadow: 0 4px 12px rgba(31, 61, 82, .14); z-index: 1050; }
+.project-actions-card .dropdown-item { padding: .4rem .75rem; color: #17324d; cursor: pointer; font-size: .875rem; }
+.project-actions-card .dropdown-item:hover, .project-actions-card .dropdown-item:focus { background: #e8f1f7; color: #17324d; }
+.module-actions { display: flex; align-items: center; justify-content: center; flex-wrap: nowrap; gap: 8px; }
+.module-actions .btn { margin: 0; padding: .35rem .6rem; border-radius: 4px; white-space: nowrap; }
+.module-rename-actions { display: flex; align-items: center; justify-content: center; flex-wrap: nowrap; gap: 8px; }
+.module-rename-actions .form-control { flex: 0 0 160px; width: 160px; padding: .35rem .6rem; }
+.module-rename-actions .btn { margin: 0; padding: .35rem .6rem; border-radius: 4px; white-space: nowrap; }
 .card-header { background: #fff; border-bottom: 1px solid var(--border); padding: .7rem .9rem; }
 .card-body { background: #fff; padding: .9rem; }
 .table { vertical-align: middle; }
+.table-responsive { width: 100%; overflow-x: auto; }
 .table thead th { white-space: nowrap; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
 .table-dark { --bs-table-bg: #e8f1f7; --bs-table-color: #17324d; --bs-table-border-color: #b7cfdf; }
 .btn { border-radius: 4px; font-weight: 600; }
@@ -70,13 +80,16 @@ body {
 .form-label { color: var(--text-h); font-size: .88rem; font-weight: 600; margin-bottom: .4rem; }
 .client-form-actions { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
 .client-form-actions .btn { width: 100%; }
+.form-actions { display: flex; flex-direction: column; gap: 12px; width: 100%; padding-top: 8px; }
+.form-actions button { width: 100%; margin: 0; }
 .text-danger { font-size: .8rem; margin-top: .35rem; }
 .page-title { color: var(--text-h); font-weight: 700; }
 .empty-state { color: #7b8781; padding: 1.25rem 1rem !important; text-align: center; }
 .summary-value { font-size: 1.35rem; font-weight: 700; color: #294a3b; }
 .summary-value.prominent { color: #2f7d5b; font-size: 1.6rem; }
 .modal-content { border: 0; border-radius: 12px; box-shadow: 0 18px 50px rgba(0,0,0,.18); }
-@media (max-width: 768px) { .app-header-inner { padding: 0 16px; } .container { padding-left: 16px; padding-right: 16px; } .table-responsive { border-radius: 8px; } .page-title { font-size: 1.45rem; } }
+@media (max-width: 768px) { .app-header-inner { padding: 0 16px; } .container { padding-left: 16px; padding-right: 16px; } .container form { width: 100%; } .table-responsive { border-radius: 8px; } .page-title { font-size: 1.45rem; } .module-actions, .module-rename-actions { justify-content: flex-start; } }
+@media (min-width: 1200px) { .container { padding-left: 24px; padding-right: 24px; } }
 
 h1,
 h2 {

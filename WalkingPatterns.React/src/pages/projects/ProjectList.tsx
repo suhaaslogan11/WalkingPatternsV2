@@ -14,6 +14,7 @@ function ProjectList() {
         [parsedClientId]
     );
     const [projects, setProjects] = useState<Project[]>([]);
+    const [showAddForm, setShowAddForm] = useState(false);
 
     const {
         register,
@@ -73,6 +74,7 @@ function ProjectList() {
 
             reset();
             await loadProjects();
+            setShowAddForm(false);
             toast.success("Project added successfully");
 
         }
@@ -117,19 +119,25 @@ function ProjectList() {
 
     return (
 
-        <div className="container py-4 py-md-5">
+        <div className="container py-3">
 
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom pb-2 mb-3">
 
-                <div><h2 className="page-title mb-1">Projects</h2><div className="text-muted small">Projects for the selected client</div></div>
+                <div className="d-flex align-items-center gap-2">
+                    <Link to="/" className="btn btn-secondary btn-sm">
+                        Back to Clients
+                    </Link>
+                </div>
 
-                <Link to="/" className="btn btn-secondary">
-                    Back to Clients
-                </Link>
+                <div className="d-flex flex-wrap gap-2">
+                    <button type="button" className="btn btn-primary" onClick={() => setShowAddForm((visible) => !visible)}>
+                        {showAddForm ? "Hide Add Project" : "+ Add Project"}
+                    </button>
+                </div>
 
             </div>
 
-            <div className="card shadow mb-4">
+            {showAddForm && <div className="card shadow-sm mb-3">
 
                 <div className="card-header">
                     <h4 className="mb-0">Add Project</h4>
@@ -173,9 +181,12 @@ function ProjectList() {
                                 )}
                             </div>
 
-                            <div className="col-md-3">
-                                <button type="submit" className="btn btn-primary w-100">
-                                    Add Project
+                            <div className="col-md-3 d-flex gap-2">
+                                <button type="submit" className="btn btn-primary flex-fill">
+                                    Save Project
+                                </button>
+                                <button type="button" className="btn btn-outline-secondary flex-fill" onClick={() => { reset(); setShowAddForm(false); }}>
+                                    Cancel
                                 </button>
                             </div>
 
@@ -185,9 +196,9 @@ function ProjectList() {
 
                 </div>
 
-            </div>
+            </div>}
 
-            <div className="card shadow">
+            <div className="card shadow-sm">
 
                 <div className="card-header">
                     <h4 className="mb-0">Client Projects</h4>
@@ -202,7 +213,7 @@ function ProjectList() {
                                 <th>Project Name</th>
                                 <th>Project Date</th>
                                 <th>Version</th>
-                                <th style={{ width: "180px" }}>Actions</th>
+                                <th style={{ width: "240px" }}>Actions</th>
                             </tr>
                         </thead>
 
@@ -220,26 +231,28 @@ function ProjectList() {
                                         <td>{project.projectDate}</td>
                                         <td>{project.versionNumber}</td>
                                         <td>
+                                            <div className="d-flex flex-nowrap align-items-center justify-content-center gap-1">
                                             <Link
                                                 to={`/projects/${project.id}`}
-                                                className="btn btn-info btn-sm me-2"
+                                                className="btn btn-info btn-sm text-nowrap"
                                             >
                                                 Details
                                             </Link>
                                             <Link
                                                 to={`/projects/edit/${project.id}`}
                                                 state={{ project }}
-                                                className="btn btn-warning btn-sm me-2"
+                                                className="btn btn-warning btn-sm text-nowrap"
                                             >
                                                 Edit
                                             </Link>
                                             <button
                                                 type="button"
-                                                className="btn btn-danger btn-sm"
+                                                className="btn btn-danger btn-sm text-nowrap"
                                                 onClick={() => handleDelete(project.id)}
                                             >
                                                 Delete
                                             </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

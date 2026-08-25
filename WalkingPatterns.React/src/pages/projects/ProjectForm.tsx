@@ -85,11 +85,11 @@ function ProjectForm() {
 
     return (
 
-        <div className="container py-4 py-md-5">
+        <div className="container py-3">
 
             <h2 className="page-title mb-4">Edit Project</h2>
 
-            <form className="card shadow-sm mx-auto p-3 p-md-4" style={{ maxWidth: 640 }} onSubmit={handleSubmit(onSubmit)} noValidate>
+            <form className="border rounded p-3 bg-white mx-auto" style={{ maxWidth: 680 }} onSubmit={handleSubmit(onSubmit)} noValidate>
 
                 <div className="mb-3">
                     <label className="form-label">Project Name</label>
@@ -123,17 +123,17 @@ function ProjectForm() {
                     )}
                 </div>
 
-                <button type="submit" className="btn btn-success">
+                <div className="form-actions"><button type="submit" className="btn btn-primary">
                     Update
                 </button>
 
                 <button
                     type="button"
-                    className="btn btn-secondary ms-2"
+                    className="btn btn-outline-secondary"
                     onClick={() => navigate(`/clients/${project.clientId}/projects`)}
                 >
                     Cancel
-                </button>
+                </button></div>
 
             </form>
 

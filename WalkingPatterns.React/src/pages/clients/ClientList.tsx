@@ -69,9 +69,7 @@ function ClientList() {
 
             <div>
 
-                <div className="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-
-                    <div><div className="page-title h3 mb-1">Clients</div><div className="text-muted small">Manage your clients and project workspaces</div></div>
+                <div className="d-flex justify-content-end align-items-center border-bottom pb-2 mb-2">
 
                     <Link
                         to="/clients/add"
