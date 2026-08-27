@@ -12,8 +12,6 @@ public class HdsPricingService : IHdsPricingService
 {
     private readonly AppDbContext _context;
     private readonly IWebHostEnvironment _environment;
-    private double materialTotal = 0;
-
     public HdsPricingService(
         AppDbContext context,
         IWebHostEnvironment environment)
@@ -61,6 +59,7 @@ public class HdsPricingService : IHdsPricingService
         var utility = request.UtilityName?.Trim() ?? string.Empty;
         var core = request.CoreMaterial?.Trim() ?? "BWR white";
         var shutter = request.ShutterMaterial?.Trim() ?? string.Empty;
+        double materialTotal = 0;
 
         if (parent != "HDS")
         {
@@ -85,9 +84,7 @@ public class HdsPricingService : IHdsPricingService
                 "HDS material/service is required."
             };
         }
-        else if (!pricing.Items.TryGetValue(
-                     shutter,
-                     out var materialTotal))
+        else if (!pricing.Items.TryGetValue(shutter, out materialTotal))
         {
             errors["shutterMaterial"] = new[]
             {

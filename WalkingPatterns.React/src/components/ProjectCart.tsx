@@ -7,9 +7,10 @@ interface ProjectCartProps {
     projectId: number;
     refreshKey?: number;
     sourceFilter?: ProjectCartSource;
+    onRefreshReady?: (refresh: () => Promise<void>) => void;
 }
 
-function ProjectCart({ projectId, refreshKey = 0, sourceFilter }: ProjectCartProps) {
+function ProjectCart({ projectId, refreshKey = 0, sourceFilter, onRefreshReady }: ProjectCartProps) {
     const [allItems, setAllItems] = useState<ProjectCartItem[]>([]);
     const [open, setOpen] = useState(false);
     const [checkoutResult, setCheckoutResult] = useState<Awaited<ReturnType<typeof projectService.checkoutProject>> | null>(null);
@@ -22,6 +23,10 @@ function ProjectCart({ projectId, refreshKey = 0, sourceFilter }: ProjectCartPro
             toast.error("Unable to load cart");
         }
     }, [projectId]);
+
+    useEffect(() => {
+        onRefreshReady?.(refresh);
+    }, [onRefreshReady, refresh]);
 
     useEffect(() => {
         let active = true;

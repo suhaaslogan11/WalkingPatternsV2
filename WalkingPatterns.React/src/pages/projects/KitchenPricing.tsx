@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -16,7 +16,11 @@ function KitchenPricingPage() {
     const parsedProjectId = Number(projectId);
     const [pricing, setPricing] = useState<KitchenPricing>();
     const [cartRefreshKey, setCartRefreshKey] = useState(0);
-    const { register, control, handleSubmit, formState: { errors }, setValue } = useForm<FormValues>({
+    const [refreshCart, setRefreshCart] = useState<(() => Promise<void>) | null>(null);
+    const onRefreshReady = useCallback((refresh: () => Promise<void>) => {
+        setRefreshCart(() => refresh);
+    }, []);
+    const { register, control, handleSubmit, reset, formState: { errors }, setValue } = useForm<FormValues>({
         defaultValues: {
             parent: "", utilityName: "", width: "", height: "", depth: "", materials: "",
             accessories: [], quantities: [], additionalItems: [], utilityNameOld: "KitchenUtility"
@@ -59,7 +63,12 @@ function KitchenPricingPage() {
                 quantities: data.quantities || []
             });
             toast.success(`Kitchen item saved. Total: ₹${result.totalPrice.toFixed(2)}`);
+            await refreshCart?.();
             setCartRefreshKey((key) => key + 1);
+            reset({
+                parent: "", utilityName: "", width: "", height: "", depth: "", materials: "",
+                accessories: [], quantities: [], additionalItems: [], utilityNameOld: "KitchenUtility"
+            });
         } catch (error) {
             console.error(error);
             const responseError = error as { response?: { data?: { message?: string } } };
@@ -76,7 +85,7 @@ function KitchenPricingPage() {
                 <h2 className="page-title mb-0">Kitchen Pricing</h2>
                 <div className="pricing-page-actions">
                     <button className="btn btn-secondary btn-sm" onClick={() => navigate(`/projects/${parsedProjectId}`)}>Back to Project</button>
-                    <ProjectCart projectId={parsedProjectId} refreshKey={cartRefreshKey} sourceFilter="Kitchen" />
+                    <ProjectCart projectId={parsedProjectId} refreshKey={cartRefreshKey} sourceFilter="Kitchen" onRefreshReady={onRefreshReady} />
                 </div>
             </div>
             <form className="pricing-form" onSubmit={handleSubmit(onSubmit)} noValidate>

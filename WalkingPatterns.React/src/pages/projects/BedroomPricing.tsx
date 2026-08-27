@@ -10,7 +10,7 @@ function BedroomPricingPage() {
     const parsedProjectId = Number(useParams().projectId);
     const [pricing, setPricing] = useState<BedroomPricing>();
     const [cartRefreshKey, setCartRefreshKey] = useState(0);
-    const { register, control, handleSubmit, formState: { errors } } = useForm<BedroomItemRequest>({
+    const { register, control, handleSubmit, reset, formState: { errors } } = useForm<BedroomItemRequest>({
         defaultValues: { parent: "", utilityName: "", width: "", height: "", depth: "", coreMaterial: "", shutterMaterial: "", additionalItems: [], utilityNameOld: "Bedroom" }
     });
     const { fields, append, remove } = useFieldArray({ control, name: "additionalItems" });
@@ -27,6 +27,7 @@ function BedroomPricingPage() {
             const result = await bedroomService.calculateAndSave(parsedProjectId, { ...data, utilityNameOld: "Bedroom" });
             toast.success(`Bedroom item saved. Total: ₹${result.totalPrice.toFixed(2)}`);
             setCartRefreshKey((key) => key + 1);
+            reset({ parent: "", utilityName: "", width: "", height: "", depth: "", coreMaterial: "", shutterMaterial: "", additionalItems: [], utilityNameOld: "Bedroom" });
         } catch (error) {
             console.error(error);
             const responseError = error as { response?: { data?: { message?: string } } };
