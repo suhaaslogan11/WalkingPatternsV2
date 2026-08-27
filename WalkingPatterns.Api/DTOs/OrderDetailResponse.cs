@@ -4,6 +4,7 @@ namespace WalkingPatterns.Api.DTOs
     {
         public int OrderId { get; set; }
         public string? Parent { get; set; }
+        public string? UtilityName { get; set; }
         public string? Materials { get; set; }
         public string? Width { get; set; }
         public string? Height { get; set; }

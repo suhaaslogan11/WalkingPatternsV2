@@ -111,6 +111,7 @@ namespace WalkingPatterns.Api.Services
                 {
                     OrderId = order.OrderId,
                     Parent = order.Parent,
+                    UtilityName = order.UtilityName,
                     Materials = order.Materials,
                     Width = order.Width,
                     Height = order.Height,

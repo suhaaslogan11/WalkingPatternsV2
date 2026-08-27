@@ -267,6 +267,74 @@ public class KitchenPricingService : IKitchenPricingService
         };
     }
 
+    public async Task<KitchenItemResponse?> UpdateOrderAsync(int projectId, int orderId, KitchenItemRequest request)
+    {
+        var project = await _context.ProjectVersionDetails.SingleOrDefaultAsync(item => item.Id == projectId);
+        if (project == null) return null;
+
+        var order = await _context.OrderDetails.SingleOrDefaultAsync(item =>
+            item.OrderId == orderId && item.ProjectVersionDetailsId == projectId && item.ProjectId == projectId);
+        if (order == null || !string.Equals(order.UtilityNameOld, "KitchenUtility", StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        var pricing = GetPricing();
+        var errors = new Dictionary<string, string[]>();
+        var parent = request.Parent?.Trim() ?? string.Empty;
+        var utility = request.UtilityName?.Trim() ?? string.Empty;
+        var material = request.Materials?.Trim() ?? string.Empty;
+        if (!pricing.ParentOptions.TryGetValue(parent, out var parentOptions)) errors["parent"] = new[] { "Parent is not available in kitchen pricing." };
+        if (!pricing.Materials.TryGetValue(material, out var materialRate)) errors["materials"] = new[] { "Material is not available in kitchen pricing." };
+        if (string.IsNullOrWhiteSpace(utility)) errors["utilityName"] = new[] { "Utility name is required." };
+        var validDimensions = TryDimension(request.Width, "width", errors, out var widthMm)
+            & TryDimension(request.Height, "height", errors, out var heightMm)
+            & TryDimension(request.Depth, "depth", errors, out var depthMm);
+        request.Accessories ??= new List<string>(); request.Quantities ??= new List<string>(); request.AdditionalItems ??= new List<KitchenAdditionalItemRequest>();
+        if (request.Accessories.Count != request.Quantities.Count) errors["quantities"] = new[] { "Accessories and quantities must have the same count." };
+        var accessoryTotal = 0d;
+        for (var i = 0; i < request.Accessories.Count && i < request.Quantities.Count; i++)
+        {
+            var accessory = request.Accessories[i]?.Trim() ?? string.Empty;
+            if (!int.TryParse(request.Quantities[i], NumberStyles.None, CultureInfo.InvariantCulture, out var quantity) || quantity <= 0) { errors[$"quantities[{i}]"] = new[] { "Accessory quantity must be a positive integer." }; continue; }
+            var option = parentOptions?.FirstOrDefault(item => item.Name.Trim() == accessory);
+            if (option == null) errors[$"accessories[{i}]"] = new[] { "Accessory is not available for the selected parent." }; else accessoryTotal += option.Price * quantity;
+        }
+        var additional = request.AdditionalItems.Where(item => !string.IsNullOrWhiteSpace(item.Name) || item.Amount != 0).ToList();
+        var additionalTotal = 0d;
+        foreach (var item in additional)
+        {
+            if (string.IsNullOrWhiteSpace(item.Name) || item.Amount < 0 || item.Quantity <= 0) errors["additionalItems"] = new[] { "Additional item name, amount, and quantity are invalid." };
+            else additionalTotal += item.Amount * item.Quantity;
+        }
+        if (errors.Count > 0 || !validDimensions) throw new KitchenValidationException(errors);
+
+        var total = Math.Round(Math.Round(widthMm / 304.8, 1) * Math.Round(heightMm / 304.8, 1) * Math.Round(depthMm / 304.8, 1) * materialRate + accessoryTotal + additionalTotal, 2);
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        order.Parent = parent; order.UtilityName = utility; order.UtilityNameOld = string.IsNullOrWhiteSpace(request.UtilityNameOld) ? "KitchenUtility" : request.UtilityNameOld.Trim();
+        order.Width = request.Width!.Trim(); order.Height = request.Height!.Trim(); order.Depth = request.Depth!.Trim(); order.Materials = material;
+        order.Accessories = string.Join(",", request.Accessories); order.Quantities = string.Join(",", request.Quantities);
+        order.AdditionalItemName = string.Join(",", additional.Select(item => item.Name!.Trim()));
+        order.AdditionalItemsAmounts = string.Join(",", additional.Select(item => item.Amount.ToString(CultureInfo.InvariantCulture)));
+        order.AdditionalItemsQuantities = string.Join(",", additional.Select(item => item.Quantity.ToString(CultureInfo.InvariantCulture)));
+        order.MaterialTotal = materialRate; order.AccessoriesTotal = accessoryTotal; order.AdditionalItemsTotal = additionalTotal; order.TotalPrice = total;
+
+        var roomOrders = await _context.OrderDetails.Where(item => item.ProjectVersionDetailsId == projectId && item.ProjectId == projectId && (item.UtilityName == utility || item.UtilityNameOld == utility)).ToListAsync();
+        var roomDetails = await _context.ProjectDetails.Where(item => item.ProjectId == projectId && item.RoomName == utility).ToListAsync();
+        var woodwork = roomOrders.Sum(item => item.MaterialTotal); var accessories = roomOrders.Sum(item => item.AccessoriesTotal); var services = roomOrders.Sum(item => item.AdditionalItemsTotal); var roomTotal = roomOrders.Sum(item => item.TotalPrice);
+        if (roomDetails.Count > 0)
+        {
+            roomDetails[0].Woodwork = woodwork.ToString(CultureInfo.InvariantCulture); roomDetails[0].Accessories = accessories.ToString(CultureInfo.InvariantCulture); roomDetails[0].Services = services.ToString(CultureInfo.InvariantCulture); roomDetails[0].Total = roomTotal.ToString(CultureInfo.InvariantCulture);
+            foreach (var detail in roomDetails.Skip(1)) { detail.Woodwork = "0"; detail.Accessories = "0"; detail.Services = "0"; detail.Total = "0"; }
+        }
+        var allDetails = await _context.ProjectDetails.Where(item => item.ProjectId == projectId).ToListAsync();
+        var grandTotal = allDetails.Sum(item => double.TryParse(item.Total, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) ? value : 0d);
+        var discountAmount = Math.Min(Math.Max(project.DiscountAmount, 0d), grandTotal);
+        project.GrandTotal = grandTotal;
+        project.DiscountAmount = discountAmount;
+        project.DiscountedTotal = grandTotal - discountAmount;
+        await _context.SaveChangesAsync(); await transaction.CommitAsync();
+        return new KitchenItemResponse { Id = order.OrderId, ProjectId = projectId, Parent = order.Parent, UtilityName = order.UtilityName, UtilityNameOld = order.UtilityNameOld, Width = order.Width, Height = order.Height, Depth = order.Depth, Materials = order.Materials, Accessories = order.Accessories, Quantities = order.Quantities, AdditionalItems = order.AdditionalItemName, MaterialTotal = order.MaterialTotal, AccessoriesTotal = order.AccessoriesTotal, AdditionalItemsTotal = order.AdditionalItemsTotal, TotalPrice = order.TotalPrice, CreatedAt = order.OrderDate };
+    }
+
     private static bool TryDimension(string? value,string key,Dictionary<string, string[]> errors,out double result)
     {
         if (!double.TryParse(value,NumberStyles.Float,CultureInfo.InvariantCulture,out result) || result <= 0)

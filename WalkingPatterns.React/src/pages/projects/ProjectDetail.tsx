@@ -10,6 +10,8 @@ import type {
     ProjectCheckoutResponse
 } from "../../models/Project";
 import projectService from "../../services/projectService";
+import KitchenOrderEdit from "../../components/KitchenOrderEdit";
+import ModuleOrderEdit from "../../components/ModuleOrderEdit";
 
 function ProjectDetail() {
 
@@ -23,6 +25,8 @@ function ProjectDetail() {
     const [details, setDetails] = useState<ProjectDetailPage>();
     const [financials, setFinancials] = useState<ProjectFinancials>();
     const [orders, setOrders] = useState<ProjectOrders | null>(null);
+    const [editingKitchenOrder, setEditingKitchenOrder] = useState<import("../../models/Project").OrderDetail | null>(null);
+    const [editingModuleOrder, setEditingModuleOrder] = useState<{ order: import("../../models/Project").OrderDetail; source: "Bedroom" | "OtherWoodwork" | "HDS" } | null>(null);
     const [cartItems, setCartItems] = useState<ProjectCartItem[]>([]);
     const [cartOpen, setCartOpen] = useState(false);
     const [moduleMenuOpen, setModuleMenuOpen] = useState(false);
@@ -128,6 +132,20 @@ function ProjectDetail() {
 
         }
 
+    };
+
+    const handleKitchenOrderSaved = async () => {
+        if (!orders) return;
+        const [updatedOrders, updatedDetails, updatedFinancials] = await Promise.all([
+            projectService.getProjectDetailOrders(orders.projectDetailId),
+            projectService.getProjectDetails(parsedProjectId),
+            projectService.getProjectFinancials(parsedProjectId)
+        ]);
+        setOrders(updatedOrders);
+        setDetails(updatedDetails);
+        setFinancials(updatedFinancials);
+        setEditingKitchenOrder(null);
+        setEditingModuleOrder(null);
     };
 
     const handleDeleteModule = async (projectDetailId: number, roomName: string) => {
@@ -557,14 +575,20 @@ function ProjectDetail() {
                                             <p><strong>Dimensions:</strong> {order.width || "N/A"} x {order.height || "N/A"} x {order.depth || "N/A"}</p>
                                             <p><strong>Accessories:</strong> {order.accessories || "N/A"}</p>
                                             <p><strong>Additional Items:</strong> {order.additionalItemName || "N/A"}</p>
-                                            <button
-                                                type="button"
-                                                className="btn btn-danger btn-sm mt-2"
-                                                onClick={() => handleDeleteOrder(order.orderId)}
-                                            >
-                                                Delete
-                                            </button>
-                                            <p className="mb-0"><strong>Total:</strong> ₹{order.totalPrice.toFixed(2)}</p>
+                                            <div className="order-item-actions">
+                                            {order.utilityNameOld?.toLowerCase() === "kitchenutility" && <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditingKitchenOrder(order)}>Edit</button>}
+                                            {order.utilityNameOld?.toLowerCase() === "bedroom" && <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditingModuleOrder({ order, source: "Bedroom" })}>Edit</button>}
+                                            {order.utilityNameOld?.toLowerCase() === "other woodwork" && <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditingModuleOrder({ order, source: "OtherWoodwork" })}>Edit</button>}
+                                            {order.utilityNameOld?.toLowerCase() === "hds" && <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditingModuleOrder({ order, source: "HDS" })}>Edit</button>}
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => handleDeleteOrder(order.orderId)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                            <p className="mb-0 text-center"><strong>Total:</strong> ₹{order.totalPrice.toFixed(2)}</p>
                                         </div>
                                     ))
                                 )}
@@ -580,6 +604,9 @@ function ProjectDetail() {
             )}
 
             {orders && <div className="modal-backdrop fade show" />}
+
+            {editingKitchenOrder && <KitchenOrderEdit projectId={parsedProjectId} order={editingKitchenOrder} onCancel={() => setEditingKitchenOrder(null)} onSaved={handleKitchenOrderSaved} />}
+            {editingModuleOrder && <ModuleOrderEdit projectId={parsedProjectId} order={editingModuleOrder.order} source={editingModuleOrder.source} onCancel={() => setEditingModuleOrder(null)} onSaved={handleKitchenOrderSaved} />}
 
         </div>
 

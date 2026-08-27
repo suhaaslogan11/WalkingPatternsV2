@@ -49,4 +49,9 @@ const calculateAndSave = async (
     return response.data;
 };
 
-export default { getPricing, calculateAndSave };
+const updateOrder = async (projectId: number, orderId: number, request: KitchenItemRequest): Promise<KitchenItemResponse> => {
+    const response = await api.put(`/projects/${projectId}/orders/${orderId}/kitchen`, request);
+    return response.data;
+};
+
+export default { getPricing, calculateAndSave, updateOrder };

@@ -5,4 +5,5 @@ export interface HdsItemRequest { parent: string; utilityName: string; width: st
 export interface HdsItemResponse { id: number; source: string; projectId: number; totalPrice: number; }
 const getPricing = async (): Promise<HdsPricing> => (await api.get("/hds/pricing")).data;
 const calculateAndSave = async (projectId: number, request: HdsItemRequest): Promise<HdsItemResponse> => (await api.post(`/projects/${projectId}/hds-items`, request)).data;
-export default { getPricing, calculateAndSave };
+const updateOrder = async (projectId: number, orderId: number, request: HdsItemRequest): Promise<HdsItemResponse> => (await api.put(`/projects/${projectId}/orders/${orderId}/hds`, request)).data;
+export default { getPricing, calculateAndSave, updateOrder };

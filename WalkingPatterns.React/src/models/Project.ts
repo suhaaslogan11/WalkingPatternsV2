@@ -37,6 +37,7 @@ export interface ProjectDetailPage {
 export interface OrderDetail {
     orderId: number;
     parent?: string;
+    utilityName?: string;
     materials?: string;
     width?: string;
     height?: string;

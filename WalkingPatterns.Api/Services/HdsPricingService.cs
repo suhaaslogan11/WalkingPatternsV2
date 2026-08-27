@@ -278,6 +278,26 @@ public class HdsPricingService : IHdsPricingService
         };
     }
 
+    public async Task<HdsItemResponse?> UpdateOrderAsync(int projectId, int orderId, HdsItemRequest request)
+    {
+        var project = await _context.ProjectVersionDetails.FindAsync(projectId);
+        var order = await _context.OrderDetails.SingleOrDefaultAsync(x => x.OrderId == orderId && x.ProjectId == projectId && x.ProjectVersionDetailsId == projectId);
+        if (project == null || order == null || !string.Equals(order.UtilityNameOld, "HDS", StringComparison.OrdinalIgnoreCase)) return null;
+        await using var tx = await _context.Database.BeginTransactionAsync();
+        var created = await CalculateAndSaveAsync(projectId, request); if (created == null) return null;
+        var temp = await _context.HDSPriceDetails.FindAsync(created.Id); if (temp == null) return null;
+        order.Parent = temp.Parent; order.UtilityName = temp.UtilityName; order.UtilityNameOld = temp.UtilityNameOld; order.Width = temp.Width; order.Height = temp.Height; order.Depth = temp.Depth; order.Materials = temp.Materials; order.Accessories = null; order.Quantities = null; order.AdditionalItemName = temp.AdditionalItemName; order.AdditionalItemsAmounts = temp.AdditionalItemsAmounts; order.AdditionalItemsQuantities = temp.AdditionalItemsQuantities; order.MaterialTotal = temp.MaterialTotal; order.AccessoriesTotal = 0; order.AdditionalItemsTotal = temp.AdditionalItemsTotal; order.TotalPrice = temp.TotalPrice;
+        _context.HDSPriceDetails.Remove(temp);
+        await SyncTotals(project, order.UtilityName ?? string.Empty); await _context.SaveChangesAsync(); await tx.CommitAsync(); created.Id = order.OrderId; return created;
+    }
+
+    private async Task SyncTotals(ProjectVersionDetails project, string room)
+    {
+        var orders = await _context.OrderDetails.Where(x => x.ProjectId == project.Id && x.ProjectVersionDetailsId == project.Id && x.UtilityName == room).ToListAsync(); var details = await _context.ProjectDetails.Where(x => x.ProjectId == project.Id && x.RoomName == room).ToListAsync();
+        if (details.Count > 0) { details[0].Woodwork = orders.Sum(x => x.MaterialTotal).ToString(CultureInfo.InvariantCulture); details[0].Accessories = "0"; details[0].Services = orders.Sum(x => x.AdditionalItemsTotal).ToString(CultureInfo.InvariantCulture); details[0].Total = orders.Sum(x => x.TotalPrice).ToString(CultureInfo.InvariantCulture); }
+        var all = await _context.ProjectDetails.Where(x => x.ProjectId == project.Id).ToListAsync(); var total = all.Sum(x => double.TryParse(x.Total, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) ? value : 0d); project.GrandTotal = total; project.DiscountAmount = Math.Min(Math.Max(project.DiscountAmount, 0), total); project.DiscountedTotal = total - project.DiscountAmount;
+    }
+
     private static bool TryDimension(
         string? value,
         string key,

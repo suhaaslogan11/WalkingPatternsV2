@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using WalkingPatterns.Api.DTOs;
 using WalkingPatterns.Api.Interfaces;
+using WalkingPatterns.Api.Services;
 
 namespace WalkingPatterns.Api.Controllers
 {
@@ -10,10 +11,18 @@ namespace WalkingPatterns.Api.Controllers
     public class ProjectsController : ControllerBase
     {
         private readonly IProjectService _projectService;
+        private readonly IKitchenPricingService _kitchenPricingService;
+        private readonly IBedroomPricingService _bedroomPricingService;
+        private readonly IOtherWoodworkPricingService _otherWoodworkPricingService;
+        private readonly IHdsPricingService _hdsPricingService;
 
-        public ProjectsController(IProjectService projectService)
+        public ProjectsController(IProjectService projectService, IKitchenPricingService kitchenPricingService, IBedroomPricingService bedroomPricingService, IOtherWoodworkPricingService otherWoodworkPricingService, IHdsPricingService hdsPricingService)
         {
             _projectService = projectService;
+            _kitchenPricingService = kitchenPricingService;
+            _bedroomPricingService = bedroomPricingService;
+            _otherWoodworkPricingService = otherWoodworkPricingService;
+            _hdsPricingService = hdsPricingService;
         }
 
         [HttpGet("clients/{clientId:int}/projects")]
@@ -144,6 +153,41 @@ namespace WalkingPatterns.Api.Controllers
                 return NotFound(new { message = "Order not found." });
 
             return NoContent();
+        }
+
+        [HttpPut("projects/{projectId:int}/orders/{orderId:int}/kitchen")]
+        public async Task<IActionResult> UpdateKitchenOrder(int projectId, int orderId, KitchenItemRequest request)
+        {
+            try
+            {
+                var updated = await _kitchenPricingService.UpdateOrderAsync(projectId, orderId, request);
+                return updated == null ? NotFound(new { message = "Kitchen order not found for this project." }) : Ok(updated);
+            }
+            catch (KitchenValidationException exception)
+            {
+                return BadRequest(new { message = exception.Message, errors = exception.Errors });
+            }
+        }
+
+        [HttpPut("projects/{projectId:int}/orders/{orderId:int}/bedroom")]
+        public async Task<IActionResult> UpdateBedroomOrder(int projectId, int orderId, BedroomItemRequest request)
+        {
+            try { var result = await _bedroomPricingService.UpdateOrderAsync(projectId, orderId, request); return result == null ? NotFound(new { message = "Bedroom order not found for this project." }) : Ok(result); }
+            catch (BedroomValidationException exception) { return BadRequest(new { message = exception.Message, errors = exception.Errors }); }
+        }
+
+        [HttpPut("projects/{projectId:int}/orders/{orderId:int}/other-woodwork")]
+        public async Task<IActionResult> UpdateOtherWoodworkOrder(int projectId, int orderId, OtherWoodworkItemRequest request)
+        {
+            try { var result = await _otherWoodworkPricingService.UpdateOrderAsync(projectId, orderId, request); return result == null ? NotFound(new { message = "Other Woodwork order not found for this project." }) : Ok(result); }
+            catch (OtherWoodworkValidationException exception) { return BadRequest(new { message = exception.Message, errors = exception.Errors }); }
+        }
+
+        [HttpPut("projects/{projectId:int}/orders/{orderId:int}/hds")]
+        public async Task<IActionResult> UpdateHdsOrder(int projectId, int orderId, HdsItemRequest request)
+        {
+            try { var result = await _hdsPricingService.UpdateOrderAsync(projectId, orderId, request); return result == null ? NotFound(new { message = "HDS order not found for this project." }) : Ok(result); }
+            catch (HdsValidationException exception) { return BadRequest(new { message = exception.Message, errors = exception.Errors }); }
         }
 
         [HttpDelete("projects/{projectId:int}/modules/{projectDetailId:int}")]

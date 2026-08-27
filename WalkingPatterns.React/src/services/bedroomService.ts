@@ -13,5 +13,7 @@ export interface BedroomItemResponse { id: number; source: string; projectId: nu
 const getPricing = async (): Promise<BedroomPricing> => (await api.get("/bedroom/pricing")).data;
 const calculateAndSave = async (projectId: number, request: BedroomItemRequest): Promise<BedroomItemResponse> =>
     (await api.post(`/projects/${projectId}/bedroom-items`, request)).data;
+const updateOrder = async (projectId: number, orderId: number, request: BedroomItemRequest): Promise<BedroomItemResponse> =>
+    (await api.put(`/projects/${projectId}/orders/${orderId}/bedroom`, request)).data;
 
-export default { getPricing, calculateAndSave };
+export default { getPricing, calculateAndSave, updateOrder };
