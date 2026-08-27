@@ -8,6 +8,9 @@ namespace WalkingPatterns.Api.Models
         public int UserId { get; set; }
 
         [Required]
+        public string UserName { get; set; } = string.Empty;
+
+        [Required]
         [MaxLength(100)]
         public string FullName { get; set; } = string.Empty;
 

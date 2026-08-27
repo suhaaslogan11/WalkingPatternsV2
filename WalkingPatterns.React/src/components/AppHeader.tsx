@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getToken, logout } from "../services/authService";
 
 function AppHeader() {
+    const navigate = useNavigate();
+    useLocation();
+    if (!getToken()) return null;
     return (
         <header className="app-header">
             <div className="app-header-inner">
@@ -8,7 +13,7 @@ function AppHeader() {
                     <span className="brand-name">Walking Patterns</span>
                     <span className="brand-subtitle">Interior Solutions</span>
                 </Link>
-                <Link to="/" className="header-logout">Logout</Link>
+                <button type="button" className="header-logout" onClick={() => { logout(); navigate("/login", { replace: true }); }}>Logout</button>
             </div>
         </header>
     );

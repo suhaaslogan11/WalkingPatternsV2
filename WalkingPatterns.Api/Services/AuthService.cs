@@ -26,6 +26,7 @@ public class AuthService : IAuthService
 
         var user = new User
         {
+            UserName = request.UserName.Trim(),
             FullName = request.FullName,
             Email = request.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
@@ -41,8 +42,12 @@ public class AuthService : IAuthService
 
     public async Task<string?> LoginAsync(LoginRequest request)
     {
+        var login = request.UsernameOrEmail.Trim();
+
         var user = await _context.Users
-            .FirstOrDefaultAsync(x => x.Email == request.Email);
+            .FirstOrDefaultAsync(x =>
+                x.Email == login ||
+                x.UserName == login);
 
         if (user == null)
             return null;

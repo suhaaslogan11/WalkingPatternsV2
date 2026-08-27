@@ -10,13 +10,19 @@ import OtherWoodworkPricing from "./pages/projects/OtherWoodworkPricing";
 import HdsPricing from "./pages/projects/HdsPricing";
 import AppHeader from "./components/AppHeader";
 import { ToastContainer } from "react-toastify";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
+import InactivityLogout from "./components/InactivityLogout";
 
 function App() {
 
     return (
     <>
         <AppHeader />
+        <InactivityLogout />
         <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route element={<ProtectedRoute />}>
 
             <Route
                 path="/"
@@ -67,6 +73,7 @@ function App() {
                 path="/projects/:projectId/hds"
                 element={<HdsPricing />}
             />
+            </Route>
 
         </Routes>
 
