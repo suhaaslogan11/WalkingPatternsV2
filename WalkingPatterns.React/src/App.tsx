@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 import ClientList from "./pages/clients/ClientList";
 import ClientForm from "./pages/clients/ClientForm";
 import ProjectList from "./pages/projects/ProjectList";
@@ -8,7 +8,6 @@ import KitchenPricing from "./pages/projects/KitchenPricing";
 import BedroomPricing from "./pages/projects/BedroomPricing";
 import OtherWoodworkPricing from "./pages/projects/OtherWoodworkPricing";
 import HdsPricing from "./pages/projects/HdsPricing";
-import AppHeader from "./components/AppHeader";
 import { ToastContainer } from "react-toastify";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -18,7 +17,6 @@ function App() {
 
     return (
     <>
-        <AppHeader />
         <InactivityLogout />
         <Routes>
             <Route path="/login" element={<Login />} />
@@ -26,11 +24,26 @@ function App() {
 
             <Route
                 path="/"
+                element={<Navigate to="/clients" replace />}
+            />
+
+            <Route
+                path="/clients"
                 element={<ClientList />}
             />
 
             <Route
+                path="/clients/new"
+                element={<ClientForm />}
+            />
+
+            <Route
                 path="/clients/add"
+                element={<ClientForm />}
+            />
+
+            <Route
+                path="/clients/:id/edit"
                 element={<ClientForm />}
             />
 
@@ -42,6 +55,11 @@ function App() {
             <Route
                 path="/clients/:clientId/projects"
                 element={<ProjectList />}
+            />
+
+            <Route
+                path="/projects/:projectId/edit"
+                element={<ProjectForm />}
             />
 
             <Route
@@ -73,6 +91,8 @@ function App() {
                 path="/projects/:projectId/hds"
                 element={<HdsPricing />}
             />
+
+            <Route path="*" element={<Navigate to="/clients" replace />} />
             </Route>
 
         </Routes>

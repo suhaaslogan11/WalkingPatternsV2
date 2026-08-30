@@ -1,17 +1,17 @@
 import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import authService from "../services/authService";
+import { useAuth } from "../auth/authContext";
 
 const INACTIVITY_TIMEOUT_MS = 90 * 1000;
 const ACTIVITY_THROTTLE_MS = 250;
 
 export default function InactivityLogout() {
-    const navigate = useNavigate();
     const location = useLocation();
+    const { isAuthenticated, logout } = useAuth();
 
     useEffect(() => {
-        if (!authService.getToken() || location.pathname === "/login") return;
+        if (!isAuthenticated || location.pathname === "/login") return;
 
         let timer: number;
         let lastActivity = 0;
@@ -21,16 +21,15 @@ export default function InactivityLogout() {
             lastActivity = now;
             window.clearTimeout(timer);
             timer = window.setTimeout(() => {
-                authService.logout();
                 toast.info("Session ended due to inactivity.");
-                navigate("/login", { replace: true });
+                logout("inactive");
             }, INACTIVITY_TIMEOUT_MS);
         };
         const events = ["mousemove", "pointerdown", "keydown", "touchstart", "scroll"] as const;
         events.forEach(event => window.addEventListener(event, resetTimer, { passive: true }));
         resetTimer();
         return () => { window.clearTimeout(timer); events.forEach(event => window.removeEventListener(event, resetTimer)); };
-    }, [location.pathname, navigate]);
+    }, [isAuthenticated, location.pathname, logout]);
 
     return null;
 }
