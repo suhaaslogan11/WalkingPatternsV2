@@ -173,14 +173,14 @@ function ClientForm() {
 
                 <div className="client-form-actions"><button
                     type="submit"
-                    className="btn btn-primary"
+                    className="btn btn-primary w-100"
                 >
                     {id ? "Update" : "Save"}
                 </button>
 
                 <button
                     type="button"
-                    className="btn btn-outline-secondary ms-2 px-4"
+                    className="btn btn-outline-secondary w-100"
                     onClick={() => navigate("/")}
                 >
                     Cancel
