@@ -25,3 +25,5 @@ node_modules/
 
 # Ignore package locks outside projects
 **/package-lock.jsonWalkingPatterns.Api/appsettings.Production.json
+WalkingPatterns.Api/.publish/
+WalkingPatterns.Api/appsettings.Production.json
