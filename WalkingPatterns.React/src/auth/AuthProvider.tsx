@@ -10,16 +10,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         const syncAuthState = () => setIsAuthenticated(Boolean(authService.getToken()));
+
         window.addEventListener(AUTH_STATE_CHANGED_EVENT, syncAuthState);
         window.addEventListener("storage", syncAuthState);
+
         return () => {
             window.removeEventListener(AUTH_STATE_CHANGED_EVENT, syncAuthState);
             window.removeEventListener("storage", syncAuthState);
         };
     }, []);
 
-    const login = useCallback(async (email: string, password: string) => {
-        await authService.login(email, password);
+    const login = useCallback(async (username: string, password: string) => {
+        await authService.login(username, password);
         setIsAuthenticated(true);
     }, []);
 
@@ -29,7 +31,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         navigate("/login", { replace: true });
     }, [navigate]);
 
-    const value = useMemo(() => ({ isAuthenticated, login, logout }), [isAuthenticated, login, logout]);
+    const value = useMemo(
+        () => ({ isAuthenticated, login, logout }),
+        [isAuthenticated, login, logout]
+    );
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
 }

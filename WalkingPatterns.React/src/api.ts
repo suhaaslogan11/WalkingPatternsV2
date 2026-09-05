@@ -2,7 +2,7 @@ import axios from "axios";
 import { clearToken, getToken } from "./services/authStorage";
 
 const api = axios.create({
-    baseURL: "https://localhost:7232/api" // Change if your API uses a different port
+     baseURL: import.meta.env.VITE_API_URL || "/api" // Change if your API uses a different port
 });
 
 api.interceptors.request.use(config => { const token = getToken(); if (token) config.headers.Authorization = `Bearer ${token}`; return config; });
